@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% block title %} {% endblock title %}
+
+    <link rel="stylesheet" href="css/bootstrap.css" />
+
+
+    <script src="js/bootstrap.js"></script>
+
+</head>
+
+
+<body>
+
+
+    <div class="container">
+        <h1>Connected</h1>
+        {% include "partials/form.njk" %}
+    </div>
+    {% block scripts %} {% endblock scripts %}
+</body>
