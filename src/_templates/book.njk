@@ -18,14 +18,18 @@
 
 <body>
 
-
+    {% include "partials/reg.njk" %}
+    {% include "partials/modalLogin.njk" %}
     <div class="container">
-      {% include "partials/reg.njk" %}
-      {% include "partials/modalLogin.njk" %}
-        {% block regBtn %}
-
-        {% endblock regBtn %}
+        {% include "partials/Btn_group.njk" %}
         {% include "partials/form.njk" %}
+
+        <div class="books">
+            {% include "partials/Book_item.njk" %}
+        </div>
+
+
+
     </div>
     {% block scripts %}
       <script src="js/main.js"></script>
