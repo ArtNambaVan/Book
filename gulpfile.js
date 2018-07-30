@@ -162,7 +162,7 @@ gulp.task('browsersync', function() {
 
 
 // default task
-gulp.task('default', ['browsersync'], function() {
+gulp.task('default', ['browsersync', 'build'], function() {
 
     // css changes
     gulp.watch(PATH.css.in,    ['css']);
