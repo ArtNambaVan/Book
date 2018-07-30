@@ -30,12 +30,6 @@
 
             <form id="login-form" class="modal-body mx-3">
               <div class="form-group row">
-                <label for="inputName" class="col-sm-2 col-form-label">Name</label>
-                <div class="col-sm-10">
-                  <input type="text" class="form-control" id="inputName" placeholder="Name">
-                </div>
-              </div>
-              <div class="form-group row">
                 <label for="inputEmail" class="col-sm-2 col-form-label">Email</label>
                 <div class="col-sm-10">
                   <input type="email" class="form-control" id="inputEmail" placeholder="Email">
@@ -65,10 +59,10 @@
   </div>
 </div>
 
-        <form class="mb-4">
+        <form id="book-form" class="mb-4">
     <div class="form-group">
-        <label for="type">Title</label>
-        <input type="text" class="form-control" id="type" placeholder="Title">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" placeholder="Title">
     </div>
 
     <div class="form-group">
@@ -83,13 +77,13 @@
 
     <div class="form-group">
         <div class="form-check">
-            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
+            <input class="form-check-input" type="radio" name="type" id="exampleRadios1" value="public">
             <label class="form-check-label" for="exampleRadios1">
             Public
             </label>
         </div>
         <div class="form-check">
-            <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
+            <input class="form-check-input" type="radio" name="type" id="exampleRadios2" value="private">
             <label class="form-check-label" for="exampleRadios2">
             Private
             </label>
@@ -100,17 +94,58 @@
 
 
         <div class="books">
-            <div class="row">
-    <div class="col-sm">ID</div>
-    <div class="col-sm">Position</div>
-    <div class="col-sm">Title</div>
-    <div class="col-sm">Description</div>
-    <div class="col-sm">Author</div>
-    <div class="col-sm">Created date</div>
-    <div class="col-sm">Genre</div>
-    <div class="col-sm">Type</div>
-    <div class="col-sm"><div class="btn btn-danger">delete</div></div>
-</div>
+            <table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Position</th>
+      <th scope="col">Title</th>
+      <th scope="col">Description</th>
+      <th scope="col">Author</th>
+      <th scope="col">Date</th>
+      <th scope="col">Genre</th>
+      <th scope="col">Type</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody class="table-group">
+    <tr>
+      <td class="id">1</td>
+      <td class="position">1</td>
+      <td class="title">JavaScript Design Patterns</td>
+      <td class="description">Design patterns are reusable solutions to commonly occurring problems in software design</td>
+      <td class="author">Addy Osmani</td>
+      <td class="date">30.07.2018</td>
+      <td class="genre">Genre</td>
+      <td class="type">Public</td>
+      <td class="delete"><button class="btn btn-danger">delete</button></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>2</td>
+      <td>Fahrenheit 451</td>
+      <td>Fahrenheit 451 is a dystopian novel by American writer Ray Bradbury</td>
+      <td>Ray Bradbury</td>
+      <td>30.07.2018</td>
+      <td>Dystopian</td>
+      <td>Public</td>
+      <td><button class="btn btn-danger">delete</button></td>
+    </tr>
+    <template id="comment-template">
+      <tr class="table-book">
+        <td class="id">1</td>
+        <td class="position">1</td>
+        <td class="title">JavaScript Design Patterns</td>
+        <td class="description">Design patterns are reusable solutions to commonly occurring problems in software design</td>
+        <td class="author">Addy Osmani</td>
+        <td class="date">30.07.2018</td>
+        <td class="genre">Genre</td>
+        <td class="type">Public</td>
+        <td class="delete"><button class="btn btn-danger">delete</button></td>
+      </tr>
+    </template>
+  </tbody>
+</table>
 
         </div>
 
