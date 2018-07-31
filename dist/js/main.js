@@ -24,7 +24,6 @@ var mediator = (function() {
     return {
     //    subscribers,
         subscribe: subscribe,
-/*            unsubscribe: unsubscribe,*/
         publish: publish
     }
 
@@ -58,7 +57,23 @@ var usersData = (function() {
 
 var booksData = (function() {
 
-       // var Private = function(id, )
+       var Private = function(id, obj) {
+           this.id = id;
+           this.title = obj.title;
+           this.description = obj.description;
+           this.genre = obj.genre;
+           this.date = obj.date;
+           this.type = obj.type;
+       };
+
+       var Public = function(id, obj) {
+           this.id = id;
+           this.title = obj.title;
+           this.description = obj.description;
+           this.genre = obj.genre;
+           this.date = obj.date;
+           this.type = obj.type;
+       };
 
 
         var data = {
@@ -72,7 +87,7 @@ var booksData = (function() {
             }
         }
 
-/*    var getBookLocalStorage = function() {
+    var getBookLocalStorage = function() {
         var books,
         booksLS = localStorage.getItem('books');
 
@@ -83,40 +98,58 @@ var booksData = (function() {
         }
 
         return books;
-    }*/
+    };
 
-/*    var addBookLocalStorage = function(book) {
+    var addBookLocalStorage = function(book) {
         var books = getBookLocalStorage();
-        if (book != null) {
-            books.push(book);
-            localStorage.setItem( 'books', JSON.stringify(books) );
-        }
-    }*/
+        books.push(book);
+        localStorage.setItem( 'books', JSON.stringify(books) );
+    };
 
     return {
-        /*getBookLocalStorage: getBookLocalStorage,*/
-        /*addBookLocalStorage : addBookLocalStorage*/
-        getBookLocalStorage : function() {
-                var books,
-                booksLS = localStorage.getItem('books');
 
-                if( booksLS === null ) {
-                    books = [];
-                } else {
-                    books = JSON.parse( booksLS );
-                }
+        addBookItem: function(obj) {
 
-                return books;
-            },
+            var newItem, ID;
+            // ID = last ID + 1
 
-        addBookLocalStorage: function(book) {
-            var books = booksData.getBookLocalStorage();
+            // Create new ID
+            if (data.allBooks[obj.type].length > 0) {
+                ID = data.allBooks[obj.type][data.allBooks[obj.type].length - 1].id + 1;
+            } else {
+                ID = 0;
+            }
 
-                //localStorage.setItem( 'books', JSON.stringify(books) );
+            //
+            if (obj.type === 'private') {
+                newItem = new Private(ID, obj);
+            } else if (obj.type === 'public') {
+                newItem = new Public(ID, obj);
+            }
+
+            // Push it into our data structure
+
+            data.allBooks[obj.type].push(newItem);
+
+            addBookLocalStorage(newItem);
+
+            // Return the new element
+            return newItem;
         },
 
-        addBook: function(book) {
-            console.log(book.title)
+        testing: function() {
+            console.log(data);
+        },
+
+        testing2: function() {
+           var books = getBookLocalStorage();
+           books.forEach(function(el) {
+                if(el.type === 'private') {
+                    data.allBooks.private.push(el);
+                } else if (el.type === 'public') {
+                    data.allBooks.public.push(el);
+                }
+           })
         }
     }
 
@@ -205,8 +238,7 @@ var bookController = (function(){
 
         // add book to bookData
 
-        //booksData.addBookLocalStorage(bookItem);
-        booksData.addBook(bookItem);
+        booksData.addBookItem(bookItem);
 
 
 
@@ -280,3 +312,14 @@ for (var i = 0; i < books.length; i++) {
     tmpl.querySelector('.type').innerText = comment.type;
     bookList.appendChild(tmpl);
 }*/
+
+
+
+
+
+
+
+
+
+
+
