@@ -76,7 +76,7 @@ var booksData = (function() {
             }
         }*/
 
-    var getBookLocalStorage = function() {
+    var getBookFromLocalStorage = function() {
         var books,
         booksLS = localStorage.getItem('books');
 
@@ -88,16 +88,26 @@ var booksData = (function() {
         return books;
     };
 
-    var addBookLocalStorage = function(book) {
-        var books = getBookLocalStorage();
+    var addBookToLocalStorage = function(book) {
+        var books = getBookFromLocalStorage();
         books.push(book);
         localStorage.setItem( 'books', JSON.stringify(books) );
     };
 
+    var removeBookFromLocalStorage = function(id) {
+        var books = getBookFromLocalStorage();
+
+        books.forEach(function(el) {
+            if(el.id === id) {
+                console.log('cool')
+            }
+        })
+    }
+
     return {
 
         addBookItem: function(obj) {
-            var data = getBookLocalStorage();
+            var data = getBookFromLocalStorage();
             var newItem, ID;
 
 
@@ -113,19 +123,29 @@ var booksData = (function() {
 
             //data.allBooks['books'].push(newItem);
 
-            addBookLocalStorage(newItem);
+            addBookToLocalStorage(newItem);
 
             return newItem;
         },
 
         localStorageOnLoad: function() {
-            var books = getBookLocalStorage();
+            var books = getBookFromLocalStorage();
 
-            books.forEach(function(el) {
-                bookController.addListItem(el);
-            })
+            return books;
 
         },
+
+        removeBookFromLocalStorage : function(id) {
+                var books = getBookFromLocalStorage();
+                console.log(books)
+                books.forEach(function(el, index) {
+                    if (el.id == id) {
+                        books.splice(index, 1)
+                    }
+                });
+                console.log(books);
+                localStorage.setItem('books', JSON.stringify(books) )
+            },
 
         testing: function() {
             console.log(data);
@@ -178,9 +198,6 @@ var bookController = (function(){
         typeNew
         ;
 
-
-
-
     showForm = function() {
         bookForm.classList.toggle('d-none');
     }
@@ -198,7 +215,7 @@ var bookController = (function(){
                 return typeNew;
             }
         });
-        console.log(title)
+       // console.log(title)
         // get value
         if (title.value !== '' && description.value !== '' && genre !== '') {
 
@@ -220,11 +237,12 @@ var bookController = (function(){
         // add book to bookData
         var newItem = booksData.addBookItem(bookItem);
 
-        addListItem(newItem)
+        /*addListItem(newItem)*/
+        mediator.publish('newBook', newItem)
     }
 
 
-    addListItem = function(obj) {
+/*    addListItem = function(obj) {
 
         var bookList = document.querySelector('.table-group');
         var tmpl = document.getElementById('comment-template').content.cloneNode(true);
@@ -238,7 +256,7 @@ var bookController = (function(){
         tmpl.querySelector('.type').innerText = obj.type;
         bookList.appendChild(tmpl);
 
-    }
+    }*/
 
     return {
         showForm: function(data) {
@@ -246,21 +264,6 @@ var bookController = (function(){
             bookForm.classList.toggle('d-none');
         },
 
-        addListItem : function(obj) {
-
-                var bookList = document.querySelector('.table-group');
-                var tmpl = document.getElementById('comment-template').content.cloneNode(true);
-                tmpl.querySelector('.id').innerText = obj.id;
-                //tmpl.querySelector('.position').innerText = comment.position;
-                tmpl.querySelector('.title').innerText = obj.title;
-                tmpl.querySelector('.description').innerText = obj.description;
-                tmpl.querySelector('.author').innerText = obj.author;
-                tmpl.querySelector('.date').innerText = obj.date;
-                tmpl.querySelector('.genre').innerText = obj.genre;
-                tmpl.querySelector('.type').innerText = obj.type;
-                bookList.appendChild(tmpl);
-
-        },
 
         deleteListItem : function() {},
 
@@ -275,6 +278,60 @@ var bookController = (function(){
 
 
 })()
+
+
+var bookTable = (function() {
+    /*mediator.subscribe('newBook', function(data) {
+        console.log(data)
+    });*/
+    var table = document.querySelector('.books');
+    console.log(table)
+
+    table.addEventListener('click', deleteBookFromTable)
+
+    //table.addEventListener('click', function(e){console.log(e.target)})
+
+    var addBookToTable = function(obj) {
+        var bookList = document.querySelector('.table-group');
+        var tmpl = document.getElementById('comment-template').content.cloneNode(true);
+        tmpl.querySelector('.id').innerText = obj.id;
+        //tmpl.querySelector('.position').innerText = comment.position;
+        tmpl.querySelector('.title').innerText = obj.title;
+        tmpl.querySelector('.description').innerText = obj.description;
+        tmpl.querySelector('.author').innerText = obj.author;
+        tmpl.querySelector('.date').innerText = obj.date;
+        tmpl.querySelector('.genre').innerText = obj.genre;
+        tmpl.querySelector('.type').innerText = obj.type;
+        bookList.appendChild(tmpl);
+    }
+
+    mediator.subscribe('newBook', addBookToTable );
+
+    var deleteBookFromTable = function(e) {
+        if (e.target.classList.contains("js-delete-btn") ) {
+            e.target.parentElement.parentElement.remove()
+            booksData.removeBookFromLocalStorage(e.target.parentElement.parentElement.querySelector('.id').textContent)
+        }
+
+        console.log(e.target.parentElement.parentElement.querySelector('.id'))
+    };
+
+    table.addEventListener('click', deleteBookFromTable);
+
+
+    var onload = function() {
+        var newb = booksData.localStorageOnLoad();
+
+        newb.forEach(function(e) {
+/*            if (e.type === 'public'){*/
+            addBookToTable(e); /*}*/
+        })
+    }
+    onload();
+
+
+
+})();
 
 
 

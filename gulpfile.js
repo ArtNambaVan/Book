@@ -8,7 +8,7 @@ const gulp       = require('gulp'),
 
   changed        = require('gulp-changed'),
   nunjucksRender = require('gulp-nunjucks-render'),
-  concat         = require('gulp-concat'),
+  //concat         = require('gulp-concat'),
 
   // other plugins
   browsersync    = require('browser-sync')
