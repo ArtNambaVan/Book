@@ -8,6 +8,7 @@ const gulp       = require('gulp'),
 
   changed        = require('gulp-changed'),
   nunjucksRender = require('gulp-nunjucks-render'),
+  concat         = require('gulp-concat'),
 
   // other plugins
   browsersync    = require('browser-sync')
@@ -29,9 +30,10 @@ PATH.css = {
 };
 
 PATH.js = {
-    in  : PATH.src + 'js/**/*.js',
+    in  : PATH.src + 'js/*.js',
     out : PATH.dest   + 'js/'
 };
+
 
 PATH.html = {
   in  : PATH.src  + '*.html',
@@ -86,6 +88,7 @@ gulp.task('styles', ['css']);
 
 // JS ================================================
 //
+
 gulp.task('js', function() {
     // console.log('************************');
     // console.log('*** Starting JS task ***');
@@ -168,7 +171,14 @@ gulp.task('default', ['browsersync', 'build'], function() {
     gulp.watch(PATH.css.in,    ['css']);
 
     // js changes
+
+
     gulp.watch(PATH.js.in,     ['js', browsersync.reload]);
+
+
+    //gulp.watch(PATH.cnct.in,     ['js', browsersync.reload]);
+
+
 
     gulp.watch(
         [

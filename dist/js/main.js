@@ -3,31 +3,29 @@ var mediator = (function() {
 
     var subscribers = {};
 
-    var subscribe = function(eventName, fn) {
-        mediator.subscribers = subscribers;
-        mediator.subscribers[eventName] = mediator.subscribers[eventName] || [];
-        mediator.subscribers[eventName].push(fn);
-    }
-
-    var unsubscribe = function(eventName,fn) {
-        // code
-    }
-
-    var publish = function(eventName, data) {
-        if (mediator.subscribers[eventName]) {
-            mediator.subscribers[eventName].forEach(function(fn) {
-                fn(data)
-            })
-        }
-    }
 
     return {
     //    subscribers,
-        subscribe: subscribe,
-        publish: publish
+        subscribe : function(eventName, fn) {
+            subscribers[eventName] = subscribers[eventName] || [];
+            subscribers[eventName].push(fn);
+        },
+
+        unsubscribe : function(eventName,fn) {
+            // code
+        },
+
+        publish : function(eventName, data) {
+            if (subscribers[eventName]) {
+                subscribers[eventName].forEach(function(fn) {
+                    fn(data)
+                })
+            }
+        }
     }
 
 })();
+
 
 var usersData = (function() {
     var users, obj, obj1;
@@ -56,36 +54,27 @@ var usersData = (function() {
 
 
 var booksData = (function() {
-
-       var Private = function(id, obj) {
+    var counter = 0;
+       var Book = function(id, obj) {
+           this.name = counter++;
            this.id = id;
            this.title = obj.title;
            this.description = obj.description;
+           this.author = obj.author;
            this.genre = obj.genre;
            this.date = obj.date;
            this.type = obj.type;
        };
 
-       var Public = function(id, obj) {
-           this.id = id;
-           this.title = obj.title;
-           this.description = obj.description;
-           this.genre = obj.genre;
-           this.date = obj.date;
-           this.type = obj.type;
-       };
-
-
-        var data = {
+        /*var data = {
             allBooks: {
-                private: [],
-                public: []
+                books: []
             },
             totals: {
                 private: 0,
                 public: 0
             }
-        }
+        }*/
 
     var getBookLocalStorage = function() {
         var books,
@@ -96,7 +85,6 @@ var booksData = (function() {
         } else {
             books = JSON.parse( booksLS );
         }
-
         return books;
     };
 
@@ -109,47 +97,38 @@ var booksData = (function() {
     return {
 
         addBookItem: function(obj) {
-            getBookLocalStorage();
+            var data = getBookLocalStorage();
             var newItem, ID;
-            // ID = last ID + 1
 
-            // Create new ID
-            if (data.allBooks[obj.type].length > 0) {
-                ID = data.allBooks[obj.type][data.allBooks[obj.type].length - 1].id + 1;
+
+            // ID = last ID + 1
+            if (data.length > 0) {
+                ID = data[data.length - 1].id + 1;
             } else {
                 ID = 0;
             }
 
-            //
-            if (obj.type === 'private') {
-                newItem = new Private(ID, obj);
-            } else if (obj.type === 'public') {
-                newItem = new Public(ID, obj);
-            }
+            newItem = new Book(ID, obj)
 
-            // Push it into our data structure
 
-            data.allBooks[obj.type].push(newItem);
+            //data.allBooks['books'].push(newItem);
 
             addBookLocalStorage(newItem);
 
-            // Return the new element
             return newItem;
+        },
+
+        localStorageOnLoad: function() {
+            var books = getBookLocalStorage();
+
+            books.forEach(function(el) {
+                bookController.addListItem(el);
+            })
+
         },
 
         testing: function() {
             console.log(data);
-        },
-
-        testing2: function() {
-           var books = getBookLocalStorage();
-           books.forEach(function(el) {
-                if(el.type === 'private') {
-                    data.allBooks.private.push(el);
-                } else if (el.type === 'public') {
-                    data.allBooks.public.push(el);
-                }
-           })
         }
     }
 
@@ -158,27 +137,24 @@ var booksData = (function() {
 
 var usersController = (function() {
 
-    var DOMstrings = {
-        inputEmail    : '#inputEmail',
-        inputPassword : '#inputPassword',
-        loginForm     : '#login-form'
-    }
+    var email  = document.querySelector('#inputEmail').value,
+    password   = document.querySelector('#inputPassword').value,
+    loginForm  = document.querySelector('#login-form'),
+    allUsers
+    ;
 
-    var loginForm  = document.querySelector(DOMstrings.loginForm);
 
-        loginForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            checkUser();
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        checkUser();
 
-        })
+    })
 
 
     var checkUser = function() {
 
-        var email     = document.querySelector(DOMstrings.inputEmail).value;
-        var password  = document.querySelector(DOMstrings.inputPassword).value;
 
-        var allUsers = usersDate.getUsers();
+        allUsers = usersDate.getUsers();
 
         for (var i = 0; i < allUsers.length; i++) {
             if (email === allUsers[i].email && password === allUsers[i].password) {
@@ -193,12 +169,14 @@ var usersController = (function() {
 
 var bookController = (function(){
 
-    var title           = document.querySelector('#title'),
-        description     = document.querySelector('#description'),
-        genre           = document.querySelector('#genre'),
-        type            = document.querySelectorAll('input[name="type"]'),
-        bookForm        = document.querySelector('#book-form'),
-        typeNew;
+    var bookForm        = document.getElementById('book-form'),
+        title           = bookForm.querySelector('.js-title'),
+        description     = bookForm.querySelector('.js-description'),
+        author          = bookForm.querySelector('.js-author'),
+        genre           = bookForm.querySelector('.js-genre'),
+        type            = bookForm.querySelectorAll('input[type="radio"]'),
+        typeNew
+        ;
 
 
 
@@ -220,16 +198,19 @@ var bookController = (function(){
                 return typeNew;
             }
         });
-
+        console.log(title)
         // get value
         if (title.value !== '' && description.value !== '' && genre !== '') {
 
             var date = new Date();
-            date = date.getMinutes();
+            var h = date.getHours();
+            var m = date.getMinutes();
+            date = h + ":" + m;
 
             var bookItem = {
                 title: title.value,
                 description: description.value,
+                author: author.value,
                 genre: genre.value,
                 type: typeNew,
                 date: date
@@ -237,36 +218,60 @@ var bookController = (function(){
         }
 
         // add book to bookData
+        var newItem = booksData.addBookItem(bookItem);
 
-        booksData.addBookItem(bookItem);
+        addListItem(newItem)
+    }
 
 
+    addListItem = function(obj) {
 
-  }
+        var bookList = document.querySelector('.table-group');
+        var tmpl = document.getElementById('comment-template').content.cloneNode(true);
+        tmpl.querySelector('.id').innerText = obj.id;
+        //tmpl.querySelector('.position').innerText = comment.position;
+        tmpl.querySelector('.title').innerText = obj.title;
+        tmpl.querySelector('.description').innerText = obj.description;
+        tmpl.querySelector('.author').innerText = obj.author;
+        tmpl.querySelector('.date').innerText = obj.date;
+        tmpl.querySelector('.genre').innerText = obj.genre;
+        tmpl.querySelector('.type').innerText = obj.type;
+        bookList.appendChild(tmpl);
+
+    }
 
     return {
-    showForm: function(data) {
-        if(data)
-        bookForm.classList.toggle('d-none');
-    },
+        showForm: function(data) {
+            if(data)
+            bookForm.classList.toggle('d-none');
+        },
 
-    deleteListItem : function(){},
+        addListItem : function(obj) {
+
+                var bookList = document.querySelector('.table-group');
+                var tmpl = document.getElementById('comment-template').content.cloneNode(true);
+                tmpl.querySelector('.id').innerText = obj.id;
+                //tmpl.querySelector('.position').innerText = comment.position;
+                tmpl.querySelector('.title').innerText = obj.title;
+                tmpl.querySelector('.description').innerText = obj.description;
+                tmpl.querySelector('.author').innerText = obj.author;
+                tmpl.querySelector('.date').innerText = obj.date;
+                tmpl.querySelector('.genre').innerText = obj.genre;
+                tmpl.querySelector('.type').innerText = obj.type;
+                bookList.appendChild(tmpl);
+
+        },
+
+        deleteListItem : function() {},
+
+        localStorageOnLoad : function() {
+
+        },
 
 
-    /*clearFields: function() {
-        var fields, fieldsArr;
+        clearFields: function() {}
 
-        fields = [title, description, genre]
-
-        fieldsArr = Array.prototype.slice.call(fields);
-
-        fieldsArr.forEach(function(current) {
-            current.value = "";
-        });
-
-        fieldsArr[0].focus();
-    }*/
-  }
+    }
 
 
 })()
@@ -280,71 +285,10 @@ var init = (function() {
         console.log(arg, 'num')
     })
 
-    /*mediator.subscribe( 'createBook', bookController.clearFields() );*/
+    //booksData.booksInit();
+
+    booksData.localStorageOnLoad()
+
 })();
-
-
-
-
-/*    mediator.subscribe('userLogin', function(count) {
-    alert(count)
-})*/
-
-
-/*var books = [
-    {'id': 3, 'position': 3, 'title': 'Some title', 'description': 'some description', 'author': 'some author',  'date': 'date', 'genre': 'genre', 'type': 'private'}
-];
-
-
-var bookList = document.querySelector('.table-group');
-
-
-for (var i = 0; i < books.length; i++) {
-    var comment = books[i];
-    var tmpl = document.getElementById('comment-template').content.cloneNode(true);
-    tmpl.querySelector('.id').innerText = comment.id;
-    tmpl.querySelector('.position').innerText = comment.position;
-    tmpl.querySelector('.title').innerText = comment.title;
-    tmpl.querySelector('.description').innerText = comment.description;
-    tmpl.querySelector('.author').innerText = comment.author;
-    tmpl.querySelector('.date').innerText = comment.date;
-    tmpl.querySelector('.genre').innerText = comment.genre;
-    tmpl.querySelector('.type').innerText = comment.type;
-    bookList.appendChild(tmpl);
-}*/
-
-
-/*var fn = function() {
-    var books,
-    booksLS = localStorage.getItem('fn');
-
-    if( booksLS === null ) {
-        books = [];
-    } else {
-        books = JSON.parse( booksLS );
-    }
-
-    return books;
-};
-
-var addBookLocalStorage = function(book) {
-    var books = fn();
-    console.log(books)
-    books.push(book);
-
-    console.log(books)
-    localStorage.setItem( 'fn', JSON.stringify(books) );
-};
-
-
-
-
-
-var test = document.querySelector('#test')
-
-test.addEventListener('click', function(el) {
-    addBookLocalStorage({})
-
-})*/
 
 
