@@ -109,7 +109,7 @@ var booksData = (function() {
     return {
 
         addBookItem: function(obj) {
-
+            getBookLocalStorage();
             var newItem, ID;
             // ID = last ID + 1
 
@@ -253,7 +253,7 @@ var bookController = (function(){
     deleteListItem : function(){},
 
 
-    clearFields: function() {
+    /*clearFields: function() {
         var fields, fieldsArr;
 
         fields = [title, description, genre]
@@ -265,7 +265,7 @@ var bookController = (function(){
         });
 
         fieldsArr[0].focus();
-    }
+    }*/
   }
 
 
@@ -314,12 +314,37 @@ for (var i = 0; i < books.length; i++) {
 }*/
 
 
+/*var fn = function() {
+    var books,
+    booksLS = localStorage.getItem('fn');
+
+    if( booksLS === null ) {
+        books = [];
+    } else {
+        books = JSON.parse( booksLS );
+    }
+
+    return books;
+};
+
+var addBookLocalStorage = function(book) {
+    var books = fn();
+    console.log(books)
+    books.push(book);
+
+    console.log(books)
+    localStorage.setItem( 'fn', JSON.stringify(books) );
+};
 
 
 
 
 
+var test = document.querySelector('#test')
 
+test.addEventListener('click', function(el) {
+    addBookLocalStorage({})
 
+})*/
 
 
