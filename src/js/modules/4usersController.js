@@ -1,11 +1,10 @@
 var userAuthorizationController = (function() {
 
-    var emailInput  = document.querySelector( '#inputEmail' ),
-        passwordInput   = document.querySelector( '#inputPassword' ),
-        loginForm  = document.querySelector( '#login-form' ),
-        allUsers
+    var emailInput      = document.getElementById( 'email-input' ),
+        passwordInput   = document.getElementById( 'password-input' ),
+        loginForm       = document.getElementById( 'login-form' ),
+        logOutBtn       = document.querySelector( '.js-logout' )
     ;
-
 
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -13,8 +12,13 @@ var userAuthorizationController = (function() {
 
     });
 
+    logOutBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        logout();
+    });
 
     var checkUser = function() {
+        var allUsers;
 
         allUsers = usersData.getUsers();
 
@@ -26,4 +30,10 @@ var userAuthorizationController = (function() {
             }
         }
     };
+
+    var logout = function() {
+        mediator.publish('userLogin', false);
+    };
+
+
 })();

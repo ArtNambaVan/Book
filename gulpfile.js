@@ -11,8 +11,8 @@ const gulp       = require('gulp'),
   concat         = require('gulp-concat'),
 
   // other plugins
-  browsersync    = require('browser-sync')
-  //del            = require('del')
+  browsersync    = require('browser-sync'),
+  del            = require('del')
 ;
 
 // PATH CONFIG ========================================
@@ -104,7 +104,7 @@ gulp.task('concat', function() {
 
 gulp.task('js', function() {
 
-    return gulp.src([PATH.js.in, '!src/js/**'])
+    return gulp.src(PATH.js.in)
         .pipe(changed(PATH.js.out))
         .pipe(gulp.dest(PATH.js.out))
         ;
@@ -159,13 +159,13 @@ gulp.task('build',
 );
 
 // CLEAN
-/*gulp.task('clean', function() {
+gulp.task('clean', function() {
   del(
     [
       PATH.dest + '*'
     ]
   );
-});*/
+});
 
 // Browser-sync task
 gulp.task('browsersync', function() {

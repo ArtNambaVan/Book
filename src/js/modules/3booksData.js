@@ -48,13 +48,13 @@ var booksData = (function() {
             return newItem;
         },
 
-        localStorageOnLoad: function() {
+        getBookItems: function() {
             var books = getBookFromLocalStorage();
 
             return books;
         },
 
-        removeBookFromLocalStorage : function(id) {
+        removeBookItem : function(id) {
             var books = getBookFromLocalStorage();
 
             books.forEach(function( el, index ) {

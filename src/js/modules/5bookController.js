@@ -9,8 +9,13 @@ var booksFormController = (function(){
         typeNew
         ;
 
-    var showForm = function() {
-        bookForm.classList.toggle( 'd-none' );
+    var showForm = function(boolean) {
+        if (boolean) {
+            bookForm.classList.remove( 'd-none' );
+        } else {
+            bookForm.classList.add( 'd-none' );
+        }
+
     };
 
     mediator.subscribe('userLogin', showForm);
@@ -46,9 +51,7 @@ var booksFormController = (function(){
             };
         }
 
-
         var newItem = booksData.addBookItem(bookItem);
-
 
         mediator.publish( 'newBook', newItem );
     };
