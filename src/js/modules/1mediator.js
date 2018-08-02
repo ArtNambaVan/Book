@@ -10,17 +10,14 @@ var mediator = (function() {
             subscribers[eventName].push(fn);
         },
 
-        unsubscribe : function(eventName,fn) {
-            // code
-        },
 
         publish : function(eventName, data) {
             if (subscribers[eventName]) {
                 subscribers[eventName].forEach(function(fn) {
-                    fn(data)
-                })
+                    fn(data);
+                });
             }
         }
-    }
+    };
 
 })();

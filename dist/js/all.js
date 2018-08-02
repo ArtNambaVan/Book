@@ -1,4 +1,3 @@
-
 var mediator = (function() {
 
     var subscribers = {};
@@ -11,9 +10,6 @@ var mediator = (function() {
             subscribers[eventName].push(fn);
         },
 
-        unsubscribe : function(eventName, fn) {
-            // code
-        },
 
         publish : function(eventName, data) {
             if (subscribers[eventName]) {
@@ -22,12 +18,9 @@ var mediator = (function() {
                 });
             }
         }
-
-
     };
 
 })();
-
 
 var usersData = (function() {
     var users, obj, obj1;
@@ -44,7 +37,7 @@ var usersData = (function() {
         password : 'Vadim123'
     };
 
-    users.push(obj,obj1);
+    users.push( obj,obj1 );
 
     return {
         getUsers: function() {
@@ -54,10 +47,9 @@ var usersData = (function() {
 
 })();
 
-
 var booksData = (function() {
     var counter = 0;
-    var Book = function(id, obj) {
+    var Book = function( id, obj ) {
         this.name = counter++;
         this.id = id;
         this.title = obj.title;
@@ -68,19 +60,9 @@ var booksData = (function() {
         this.type = obj.type;
     };
 
-        /*var data = {
-            allBooks: {
-                books: []
-            },
-            totals: {
-                private: 0,
-                public: 0
-            }
-        }*/
-
     var getBookFromLocalStorage = function() {
         var books,
-            booksLS = localStorage.getItem('books');
+            booksLS = localStorage.getItem( 'books' );
 
         if( booksLS === null ) {
             books = [];
@@ -90,42 +72,27 @@ var booksData = (function() {
         return books;
     };
 
-    var addBookToLocalStorage = function(book) {
+    var addBookToLocalStorage = function( book ) {
         var books = getBookFromLocalStorage();
         books.push(book);
         localStorage.setItem( 'books', JSON.stringify(books) );
     };
 
-    /*var removeBookFromLocalStorage = function(id) {
-        var books = getBookFromLocalStorage();
-
-        books.forEach(function(el) {
-            if(el.id === id) {
-                console.log('cool')
-            }
-        });
-    };*/
-
     return {
 
-        addBookItem: function(obj) {
+        addBookItem: function( obj ) {
             var data = getBookFromLocalStorage();
             var newItem, ID;
 
-
-            // ID = last ID + 1
             if (data.length > 0) {
                 ID = data[data.length - 1].id + 1;
             } else {
                 ID = 0;
             }
 
-            newItem = new Book(ID, obj);
+            newItem = new Book( ID, obj );
 
-
-            //data.allBooks['books'].push(newItem);
-
-            addBookToLocalStorage(newItem);
+            addBookToLocalStorage( newItem );
 
             return newItem;
         },
@@ -134,31 +101,27 @@ var booksData = (function() {
             var books = getBookFromLocalStorage();
 
             return books;
-
         },
 
         removeBookFromLocalStorage : function(id) {
             var books = getBookFromLocalStorage();
 
-            books.forEach(function(el, index) {
-                if (el.id == id) {
-                    books.splice(index, 1);
+            books.forEach(function( el, index ) {
+                if ( el.id == id ) {
+                    books.splice( index, 1 );
                 }
             });
 
-            localStorage.setItem('books', JSON.stringify(books) );
+            localStorage.setItem( 'books', JSON.stringify(books) );
         }
-
     };
-
 })();
 
+var userAuthorizationController = (function() {
 
-var usersController = (function() {
-
-    var email  = document.querySelector('#inputEmail').value,
-        password   = document.querySelector('#inputPassword').value,
-        loginForm  = document.querySelector('#login-form'),
+    var emailInput  = document.querySelector( '#inputEmail' ),
+        passwordInput   = document.querySelector( '#inputPassword' ),
+        loginForm  = document.querySelector( '#login-form' ),
         allUsers
     ;
 
@@ -172,12 +135,11 @@ var usersController = (function() {
 
     var checkUser = function() {
 
-
         allUsers = usersData.getUsers();
 
         for (var i = 0; i < allUsers.length; i++) {
-            if (email === allUsers[i].email && password === allUsers[i].password) {
-                $('#modalLoginForm').modal('hide');
+            if (emailInput.value === allUsers[i].email && passwordInput.value === allUsers[i].password) {
+                $( '#modalLoginForm' ).modal( 'hide' );
                 alert('hello ' + allUsers[i].name);
                 mediator.publish('userLogin', true);
             }
@@ -185,8 +147,7 @@ var usersController = (function() {
     };
 })();
 
-
-var bookController = (function(){
+var booksFormController = (function(){
 
     var bookForm        = document.getElementById('book-form'),
         title           = bookForm.querySelector('.js-title'),
@@ -197,9 +158,11 @@ var bookController = (function(){
         typeNew
         ;
 
-    showForm = function() {
-        bookForm.classList.toggle('d-none');
+    var showForm = function() {
+        bookForm.classList.toggle( 'd-none' );
     };
+
+    mediator.subscribe('userLogin', showForm);
 
     bookForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -208,8 +171,8 @@ var bookController = (function(){
 
     var createBook = function() {
 
-        type.forEach(function(el) {
-            if (el.checked) {
+        type.forEach(function( el ) {
+            if ( el.checked ) {
                 typeNew = el.value;
                 return typeNew;
             }
@@ -236,13 +199,33 @@ var bookController = (function(){
         var newItem = booksData.addBookItem(bookItem);
 
 
-        mediator.publish('newBook', newItem);
+        mediator.publish( 'newBook', newItem );
     };
 
 })();
 
+var counterController = (function() {
+    var counter = document.querySelector('.js-count');
 
-var bookTable = (function() {
+    var count = 0;
+    var addCounter = function( obj ) {
+        count++;
+        counter.textContent = count;
+    };
+
+    var updateCounter = function(obj) {
+        obj.forEach(function( e ) {
+            count++;
+        });
+
+        counter.textContent = count;
+    };
+
+    mediator.subscribe('newBook', addCounter );
+    mediator.subscribe('updateBooks', updateCounter );
+})();
+
+var bookTableController = (function() {
     /*mediator.subscribe('newBook', function(data) {
         console.log(data)
     });*/
@@ -281,13 +264,13 @@ var bookTable = (function() {
 
     var onload = function() {
         var newb = booksData.localStorageOnLoad();
-
         newb.forEach(function(e) {
 
             addBookToTable(e);
         });
+
+        mediator.publish('updateBooks', newb);
     };
     onload();
 
 })();
-

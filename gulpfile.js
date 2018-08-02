@@ -8,7 +8,7 @@ const gulp       = require('gulp'),
 
   changed        = require('gulp-changed'),
   nunjucksRender = require('gulp-nunjucks-render'),
-  //concat         = require('gulp-concat'),
+  concat         = require('gulp-concat'),
 
   // other plugins
   browsersync    = require('browser-sync')
@@ -33,6 +33,11 @@ PATH.js = {
     in  : PATH.src + 'js/*.js',
     out : PATH.dest   + 'js/'
 };
+
+PATH.concat = {
+    in  : PATH.src + 'js/modules/*.js',
+    out : PATH.dest + 'js/'
+}
 
 
 PATH.html = {
@@ -89,14 +94,17 @@ gulp.task('styles', ['css']);
 // JS ================================================
 //
 
-gulp.task('js', function() {
-    // console.log('************************');
-    // console.log('*** Starting JS task ***');
-    // console.log('************************');
+gulp.task('concat', function() {
+    return gulp.src(PATH.concat.in)
+        .pipe(concat('all.js'))
+        .pipe(changed(PATH.concat.out))
+        .pipe(gulp.dest(PATH.concat.out))
+        ;
+})
 
-    return gulp.src(PATH.js.in)
-        // .pipe(concat('app.min.js'))
-        // .pipe(uglify())
+gulp.task('js', function() {
+
+    return gulp.src([PATH.js.in, '!src/js/**'])
         .pipe(changed(PATH.js.out))
         .pipe(gulp.dest(PATH.js.out))
         ;
@@ -139,6 +147,7 @@ gulp.task('build',
 
     [   'styles',
         'js',
+        'concat',
         'html'
     ],
 
@@ -176,7 +185,7 @@ gulp.task('default', ['browsersync', 'build'], function() {
     gulp.watch(PATH.js.in,     ['js', browsersync.reload]);
 
 
-    //gulp.watch(PATH.cnct.in,     ['js', browsersync.reload]);
+    gulp.watch(PATH.concat.in,     ['concat', browsersync.reload]);
 
 
 
