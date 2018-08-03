@@ -1,5 +1,5 @@
 var booksData = (function() {
-    var counter = 0;
+
     var Book = function( id, obj ) {
         this.id = id;
         this.title = obj.title;

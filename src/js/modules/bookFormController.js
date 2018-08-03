@@ -9,16 +9,16 @@ var booksFormController = (function(){
         type
         ;
 
-    var showForm = function(boolean) {
-        if (boolean) {
-            bookForm.classList.remove( 'd-none' );
-        } else {
-            bookForm.classList.add( 'd-none' );
-        }
+    var showForm = function() {
+        bookForm.classList.remove( 'd-none' );
     };
 
+    var hideForm = function() {
+        bookForm.classList.add( 'd-none' );
+    };
 
-    mediator.subscribe('userLogin', showForm);
+    mediator.subscribe('userLogIn', showForm);
+    mediator.subscribe('userLogOut', hideForm);
 
     bookForm.addEventListener('submit', function(e) {
         e.preventDefault();
