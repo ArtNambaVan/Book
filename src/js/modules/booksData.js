@@ -1,7 +1,6 @@
 var booksData = (function() {
     var counter = 0;
     var Book = function( id, obj ) {
-        this.name = counter++;
         this.id = id;
         this.title = obj.title;
         this.description = obj.description;
@@ -29,21 +28,42 @@ var booksData = (function() {
         localStorage.setItem( 'books', JSON.stringify(books) );
     };
 
+    var getBookID = function() {
+        var IDs,
+            IDLS = localStorage.getItem( 'ID' );
+
+        if ( IDLS === null ) {
+            IDs = [];
+        } else {
+            IDs = JSON.parse ( IDLS );
+        }
+        return IDs;
+
+    };
+
+    var addBookID = function( ID ) {
+        var IDs = getBookID();
+
+        IDs.push( ID );
+        localStorage.setItem( 'ID', JSON.stringify(IDs) );
+    };
+
     return {
 
         addBookItem: function( obj ) {
-            var data = getBookFromLocalStorage();
-            var newItem, ID;
+            var IDs   = getBookID(),
+                newItem, newID;
 
-            if (data.length > 0) {
-                ID = data[data.length - 1].id + 1;
+            if (IDs.length > 0) {
+                newID = IDs.length;
             } else {
-                ID = 0;
+                newID = 0;
             }
 
-            newItem = new Book( ID, obj );
+            newItem = new Book( newID, obj );
 
             addBookToLocalStorage( newItem );
+            addBookID( newID );
 
             return newItem;
         },
