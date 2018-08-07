@@ -1,11 +1,13 @@
 {
     "env": {
         "browser": true,
-        "commonjs": true
+        "commonjs": true,
+        "jquery": true
     },
     "extends": "eslint:recommended",
     "parserOptions": {
-        "ecmaVersion": 5
+        "ecmaVersion": 5,
+        "sourceType": "module"
     },
     "rules": {
         "indent": [

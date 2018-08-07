@@ -1,6 +1,6 @@
 var booksData = (function() {
 
-    var Book = function( id, obj ) {
+    var Book = function(id, obj) {
         this.id = id;
         this.title = obj.title;
         this.description = obj.description;
@@ -12,45 +12,45 @@ var booksData = (function() {
 
     var getBookFromLocalStorage = function() {
         var books,
-            booksLS = localStorage.getItem( 'books' );
+            booksLS = localStorage.getItem('books');
 
-        if( booksLS === null ) {
+        if(booksLS === null) {
             books = [];
         } else {
-            books = JSON.parse( booksLS );
+            books = JSON.parse(booksLS);
         }
         return books;
     };
 
-    var addBookToLocalStorage = function( book ) {
+    var addBookToLocalStorage = function(book) {
         var books = getBookFromLocalStorage();
         books.push(book);
-        localStorage.setItem( 'books', JSON.stringify(books) );
+        localStorage.setItem('books', JSON.stringify(books));
     };
 
     var getBookID = function() {
         var IDs,
-            IDLS = localStorage.getItem( 'ID' );
+            IDLS = localStorage.getItem('ID');
 
-        if ( IDLS === null ) {
+        if (IDLS === null) {
             IDs = [];
         } else {
-            IDs = JSON.parse ( IDLS );
+            IDs = JSON.parse (IDLS);
         }
         return IDs;
 
     };
 
-    var addBookID = function( ID ) {
+    var addBookID = function(ID) {
         var IDs = getBookID();
 
-        IDs.push( ID );
-        localStorage.setItem( 'ID', JSON.stringify(IDs) );
+        IDs.push(ID);
+        localStorage.setItem('ID', JSON.stringify(IDs));
     };
 
     return {
 
-        addBookItem: function( obj ) {
+        addBookItem: function(obj) {
             var IDs   = getBookID(),
                 newItem, newID;
 
@@ -60,10 +60,10 @@ var booksData = (function() {
                 newID = 0;
             }
 
-            newItem = new Book( newID, obj );
+            newItem = new Book(newID, obj);
 
-            addBookToLocalStorage( newItem );
-            addBookID( newID );
+            addBookToLocalStorage(newItem);
+            addBookID(newID);
 
             return newItem;
         },
@@ -77,13 +77,13 @@ var booksData = (function() {
         removeBookItem : function(id) {
             var books = getBookFromLocalStorage();
 
-            books.forEach(function( el, index ) {
-                if ( el.id == id ) {
-                    books.splice( index, 1 );
+            books.forEach(function(el, index) {
+                if (el.id == id) {
+                    books.splice(index, 1);
                 }
             });
 
-            localStorage.setItem( 'books', JSON.stringify(books) );
+            localStorage.setItem('books', JSON.stringify(books));
         }
     };
 })();

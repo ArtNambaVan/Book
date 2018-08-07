@@ -17,25 +17,25 @@ var usersData = (function() {
         password : 'Vadim123'
     };
 
-    users.push( user1,user2 );
+    users.push(user1,user2);
 
 
     var getUserFromLocalStorage = function() {
         var users,
-            usersLS = localStorage.getItem( 'users' );
+            usersLS = localStorage.getItem('users');
 
         if( usersLS === null ) {
             users = [];
         } else {
-            users = JSON.parse( usersLS );
+            users = JSON.parse(usersLS);
         }
         return users;
     };
 
-    var addUserToLocalStorage = function( user ) {
+    var addUserToLocalStorage = function(user) {
         var users = getUserFromLocalStorage();
         users.push(user);
-        localStorage.setItem( 'users', JSON.stringify(users) );
+        localStorage.setItem('users', JSON.stringify(users));
     };
 
 
@@ -43,7 +43,7 @@ var usersData = (function() {
         var IDs = getUserID();
 
         IDs.push( ID );
-        localStorage.setItem( 'ID', JSON.stringify(IDs) );
+        localStorage.setItem('ID', JSON.stringify(IDs));
     };
 
 
@@ -55,12 +55,12 @@ var usersData = (function() {
 
         getCurrentUser: function() {
             var user,
-                currUser = localStorage.getItem( 'currentUser' );
+                currUser = localStorage.getItem('currentUser');
 
             if( currUser === null ) {
                 user = null;
             } else {
-                user = JSON.parse( currUser );
+                user = JSON.parse(currUser);
             }
             return user;
         },
@@ -68,7 +68,7 @@ var usersData = (function() {
         currentUser: function (user) {
             var currUser = [];
             currUser.push(user);
-            localStorage.setItem( 'currentUser', JSON.stringify(currUser) );
+            localStorage.setItem('currentUser', JSON.stringify(currUser));
         },
 
         deleteCurrentUser: function () {

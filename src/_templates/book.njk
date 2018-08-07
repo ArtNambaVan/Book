@@ -26,9 +26,10 @@
 
     {% include "partials/modal-login.njk" %}
 <div class="container">
-    {% include "partials/alert.njk" %}
+    {% include "partials/alert-welcome.njk" %}
     {% include "partials/counter.njk" %}
     {% include "partials/btn-group.njk" %}
+    {% include "partials/alert-require.njk" %}
     {% include "partials/form.njk" %}
 
     <div class="books">
@@ -37,6 +38,7 @@
 
 
 </div>
+    {% include "partials/scripts-temp.njk" %}
     {% block scripts %}
       <script src="js/all.js"></script>
     {% endblock scripts %}

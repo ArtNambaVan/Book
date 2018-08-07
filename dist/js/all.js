@@ -20,16 +20,16 @@ var mediator = (function() {
 })();
 
 var counterController = (function() {
-    var counter = document.querySelector( '.js-count' );
+    var counter = document.querySelector('.js-count');
     var count = 0;
 
-    var publicBooksCounter = function( arr ) {
+    var publicBooksCounter = function(arr) {
         count = arr.length;
         counter.textContent = count;
         return count;
     };
 
-    var allBooksCounter = function( arr ) {
+    var allBooksCounter = function(arr) {
         count = arr.length;
         counter.textContent = count;
         return count;
@@ -47,41 +47,55 @@ var counterController = (function() {
         return count;
     };
 
-    var removeCounter = function( arr ) {
+    var removeCounter = function(arr) {
         count -= arr.length;
         counter.textContent = count;
         return count;
     };
 
-    mediator.subscribe( 'countPublicBooks', publicBooksCounter );
-    mediator.subscribe( 'countAllBooks', allBooksCounter );
-    mediator.subscribe( 'increaseCounter', increaseCounter );
-    mediator.subscribe( 'removeCounter', removeCounter );
-    mediator.subscribe( 'reduceCount', reduceCount );
+    mediator.subscribe('countPublicBooks', publicBooksCounter);
+    mediator.subscribe('countAllBooks', allBooksCounter);
+    mediator.subscribe('increaseCounter', increaseCounter);
+    mediator.subscribe('removeCounter', removeCounter);
+    mediator.subscribe('reduceCount', reduceCount);
 
 })();
 
-var booksFormController = (function(){
+var booksFormController = (function() {
 
-    var bookForm             = document.getElementById('book-form'),
-        inputTitle           = bookForm.querySelector('.js-title'),
-        inputDescription     = bookForm.querySelector('.js-description'),
-        //inputAuthor          = bookForm.querySelector('.js-author'),
-        inputGenre           = bookForm.querySelector('.js-genre'),
-        inputType            = bookForm.querySelectorAll('input[type="radio"]'),
-        type
+    var bookForm = document.getElementById('book-form');
+
+    var createForm = function() {
+        var $tmpl     = $('#temp').html(),
+            $bookForm = $('#book-form'),
+            html
         ;
 
-    var showForm = function() {
-        bookForm.classList.remove( 'd-none' );
+        html = Mustache.to_html($tmpl);
+        $bookForm.html(html).hide().fadeIn(1000);
+
+        addListenerOnGenre();
     };
 
-    var hideForm = function() {
-        bookForm.classList.add( 'd-none' );
+    var addListenerOnGenre = function() {
+        var $arrow = $('#book-form').find('.toggle-arrow'),
+            $panel = $('#book-form').find('.panel')
+        ;
+        $panel.hide();
+
+        $arrow.on('click', function() {
+            $panel.toggle('slow');
+        });
     };
 
-    mediator.subscribe('userLogIn', showForm);
-    mediator.subscribe('userLogOut', hideForm);
+    var removeForm = function() {
+        $('#book-form').children().fadeOut(500,function(){
+            $(this).remove();
+        });
+    };
+
+    mediator.subscribe('userLogIn', createForm);
+    mediator.subscribe('userLogOut', removeForm);
 
     bookForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -89,19 +103,32 @@ var booksFormController = (function(){
     });
 
     var createBook = function() {
-        var now, date, user, author;
+        var inputTitle           = bookForm.querySelector('.js-title'),
+            inputDescription     = bookForm.querySelector('.js-description'),
+            inputType            = bookForm.querySelectorAll('input[type="radio"]'),
+            inputCheckbox        = bookForm.querySelectorAll('.genre-checkbox'),
+            genre                = '',
+            type, now, date, user, author
+            ;
 
         user = usersData.getCurrentUser()[0];
         author = user.name;
 
-        inputType.forEach(function( el ) {
-            if ( el.checked ) {
+        inputType.forEach(function(el) {
+            if (el.checked) {
                 type = el.value;
                 return type;
             }
         });
 
-        if (inputTitle.value !== '' && inputDescription.value !== '' && inputGenre !== '') {
+        inputCheckbox.forEach(function(el) {
+            if (el.checked) {
+                genre += el.value + ' ';
+            }
+            return genre;
+        });
+
+        if (inputTitle.value !== '' && inputDescription.value !== '' && genre !== '') {
 
             now = new Date();
             date = now.getHours() + ':' + now.getMinutes();
@@ -110,24 +137,25 @@ var booksFormController = (function(){
                 title: inputTitle.value,
                 description: inputDescription.value,
                 author: author,
-                genre: inputGenre.value,
+                genre: genre,
                 type: type,
                 date: date
             };
             bookForm.reset();
+
+
+            var newItem = booksData.addBookItem(bookItem);
+
+            mediator.publish('newBook', newItem);
+        } else {
+            mediator.publish('mandatory');
         }
-
-        var newItem = booksData.addBookItem(bookItem);
-
-        mediator.publish( 'newBook', newItem );
     };
-
-
 })();
 
 var booksData = (function() {
 
-    var Book = function( id, obj ) {
+    var Book = function(id, obj) {
         this.id = id;
         this.title = obj.title;
         this.description = obj.description;
@@ -139,45 +167,45 @@ var booksData = (function() {
 
     var getBookFromLocalStorage = function() {
         var books,
-            booksLS = localStorage.getItem( 'books' );
+            booksLS = localStorage.getItem('books');
 
-        if( booksLS === null ) {
+        if(booksLS === null) {
             books = [];
         } else {
-            books = JSON.parse( booksLS );
+            books = JSON.parse(booksLS);
         }
         return books;
     };
 
-    var addBookToLocalStorage = function( book ) {
+    var addBookToLocalStorage = function(book) {
         var books = getBookFromLocalStorage();
         books.push(book);
-        localStorage.setItem( 'books', JSON.stringify(books) );
+        localStorage.setItem('books', JSON.stringify(books));
     };
 
     var getBookID = function() {
         var IDs,
-            IDLS = localStorage.getItem( 'ID' );
+            IDLS = localStorage.getItem('ID');
 
-        if ( IDLS === null ) {
+        if (IDLS === null) {
             IDs = [];
         } else {
-            IDs = JSON.parse ( IDLS );
+            IDs = JSON.parse (IDLS);
         }
         return IDs;
 
     };
 
-    var addBookID = function( ID ) {
+    var addBookID = function(ID) {
         var IDs = getBookID();
 
-        IDs.push( ID );
-        localStorage.setItem( 'ID', JSON.stringify(IDs) );
+        IDs.push(ID);
+        localStorage.setItem('ID', JSON.stringify(IDs));
     };
 
     return {
 
-        addBookItem: function( obj ) {
+        addBookItem: function(obj) {
             var IDs   = getBookID(),
                 newItem, newID;
 
@@ -187,10 +215,10 @@ var booksData = (function() {
                 newID = 0;
             }
 
-            newItem = new Book( newID, obj );
+            newItem = new Book(newID, obj);
 
-            addBookToLocalStorage( newItem );
-            addBookID( newID );
+            addBookToLocalStorage(newItem);
+            addBookID(newID);
 
             return newItem;
         },
@@ -204,13 +232,13 @@ var booksData = (function() {
         removeBookItem : function(id) {
             var books = getBookFromLocalStorage();
 
-            books.forEach(function( el, index ) {
-                if ( el.id == id ) {
-                    books.splice( index, 1 );
+            books.forEach(function(el, index) {
+                if (el.id == id) {
+                    books.splice(index, 1);
                 }
             });
 
-            localStorage.setItem( 'books', JSON.stringify(books) );
+            localStorage.setItem('books', JSON.stringify(books));
         }
     };
 })();
@@ -221,21 +249,21 @@ var bookTableController = (function() {
 
 
 
-    var addBookToTable = function( obj ) {
-        var bookList = document.querySelector( '.table-group' ),
-            tmpl = document.getElementById( 'comment-template' ).content.cloneNode( true );
-        tmpl.querySelector( '.id' ).innerText = obj.id;
-        tmpl.querySelector( '.title' ).innerText = obj.title;
-        tmpl.querySelector( '.description' ).innerText = obj.description;
-        tmpl.querySelector( '.author' ).innerText = obj.author;
-        tmpl.querySelector( '.date' ).innerText = obj.date;
-        tmpl.querySelector( '.genre' ).innerText = obj.genre;
-        tmpl.querySelector( '.type' ).innerText = obj.type;
-        tmpl.querySelector( '.js-delete-btn' ).addEventListener( 'click', deleteBookFromTable );
-        bookList.appendChild( tmpl );
+    var addBookToTable = function(obj) {
+        var bookList = document.querySelector('.table-group'),
+            tmpl = document.getElementById('comment-template').content.cloneNode(true);
+        tmpl.querySelector('.id').innerText = obj.id;
+        tmpl.querySelector('.title').innerText = obj.title;
+        tmpl.querySelector('.description').innerText = obj.description;
+        tmpl.querySelector('.author').innerText = obj.author;
+        tmpl.querySelector('.date').innerText = obj.date;
+        tmpl.querySelector('.genre').innerText = obj.genre;
+        tmpl.querySelector('.type').innerText = obj.type;
+        tmpl.querySelector('.js-delete-btn').addEventListener('click', deleteBookFromTable);
+        bookList.appendChild(tmpl);
 
         updateBookPosition();
-        mediator.publish( 'increaseCounter' );
+        mediator.publish('increaseCounter');
     };
 
 
@@ -244,9 +272,9 @@ var bookTableController = (function() {
 
     var updateBookPosition = function() {
 
-        var bookList = document.querySelector( '.table-group' );
+        var bookList = document.querySelector('.table-group');
         Array.from(bookList.children).forEach(function(e, i) {
-            var position = e.querySelector( '.position' );
+            var position = e.querySelector('.position');
 
             if (position != null) {
                 var num = i;
@@ -256,11 +284,11 @@ var bookTableController = (function() {
     };
 
     var deleteBookFromTable = function(e) {
-        if (e.target.classList.contains( 'js-delete-btn' ) ) {
+        if (e.target.classList.contains('js-delete-btn')) {
             e.target.parentElement.parentElement.remove();
-            booksData.removeBookItem( e.target.parentElement.parentElement.querySelector('.id').textContent );
+            booksData.removeBookItem(e.target.parentElement.parentElement.querySelector('.id').textContent);
             updateBookPosition();
-            mediator.publish( 'reduceCount');
+            mediator.publish('reduceCount');
         }
     };
 
@@ -269,13 +297,13 @@ var bookTableController = (function() {
             allBooks = booksData.getBookItems();
 
         allBooks.forEach(function(e) {
-            if ( e.type.toLowerCase() === 'private' ) {
+            if (e.type.toLowerCase() === 'private') {
                 addBookToTable(e);
                 privateBooks.push(e);
             }
         });
         updateBookPosition();
-        mediator.publish( 'countAllBooks', allBooks );
+        mediator.publish('countAllBooks', allBooks);
     };
 
     var showPublicBooks = function() {
@@ -283,22 +311,22 @@ var bookTableController = (function() {
             allBooks = booksData.getBookItems();
 
         allBooks.forEach(function(e) {
-            if ( e.type.toLowerCase() === 'public' ) {
+            if (e.type.toLowerCase() === 'public') {
                 addBookToTable(e);
                 publicBooks.push(e);
             }
         });
 
         updateBookPosition();
-        mediator.publish( 'countPublicBooks', publicBooks );
+        mediator.publish('countPublicBooks', publicBooks);
     };
 
     var removePrivateBooks = function() {
-        var booksRow = document.querySelectorAll( '.table-book' );
+        var booksRow = document.querySelectorAll('.table-book');
         var books = [];
 
         booksRow.forEach(function( e ) {
-            if ( e.querySelector('.type').textContent.toLowerCase() === 'private' ) {
+            if (e.querySelector('.type').textContent.toLowerCase() === 'private') {
                 books.push(e);
                 e.remove();
             }
@@ -306,7 +334,7 @@ var bookTableController = (function() {
 
         updateBookPosition();
 
-        mediator.publish( 'removeCounter', books );
+        mediator.publish('removeCounter', books);
     };
 
     /////////
@@ -330,9 +358,9 @@ var bookTableController = (function() {
 
 
     showPublicBooks();
-    mediator.subscribe( 'userLogIn', showPrivateBooks );
-    mediator.subscribe( 'userLogOut', removePrivateBooks );
-    mediator.subscribe( 'newBook', addBookToTable );
+    mediator.subscribe('userLogIn', showPrivateBooks);
+    mediator.subscribe('userLogOut', removePrivateBooks);
+    mediator.subscribe('newBook', addBookToTable);
 
 
     /////////
@@ -343,17 +371,31 @@ var bookTableController = (function() {
 
 })();
 
+var requireAlert = (function() {
+
+    var showAlert = function() {
+
+        $('#requireAlert').show('fade');
+
+        setTimeout(function() {
+            $('#requireAlert').hide('fade');
+        }, 1000);
+    };
+
+    mediator.subscribe('mandatory', showAlert);
+})();
+
 var successAlert = (function() {
 
     var showAlert = function(obj) {
 
 
-        var tmpl = $('#user-name-template').html();
+        var tmpl = '{{name}}';
         var html = Mustache.to_html(tmpl, obj);
 
         $('#user-name').html(html);
-
         $('#successAlert').show('fade');
+
         setTimeout(function() {
             $('#successAlert').hide('fade');
         }, 2000);
@@ -364,11 +406,11 @@ var successAlert = (function() {
 
 var userAuthorizationController = (function() {
 
-    var emailInput      = document.getElementById( 'email-input' ),
-        passwordInput   = document.getElementById( 'password-input' ),
-        loginForm       = document.getElementById( 'login-form' ),
-        logOutBtn       = document.querySelector( '.js-logout' ),
-        logInBtn        = document.querySelector( '.js-login' )
+    var emailInput      = document.getElementById('email-input'),
+        passwordInput   = document.getElementById('password-input'),
+        loginForm       = document.getElementById('login-form'),
+        logOutBtn       = document.querySelector('.js-logout'),
+        logInBtn        = document.querySelector('.js-login')
     ;
 
 
@@ -380,8 +422,8 @@ var userAuthorizationController = (function() {
 
     logOutBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        logInBtn.classList.toggle( 'd-none' );
-        logOutBtn.classList.toggle( 'd-none' );
+        logInBtn.classList.toggle('d-none');
+        logOutBtn.classList.toggle('d-none');
         usersData.deleteCurrentUser();
         mediator.publish('userLogOut');
     });
@@ -392,10 +434,9 @@ var userAuthorizationController = (function() {
 
         allUsers.forEach(function(user) {
             if (emailInput.value === user.email && passwordInput.value === user.password) {
-                $( '#modalLoginForm' ).modal( 'hide' );
-                alert('hello ' + user.name);
-                logInBtn.classList.toggle( 'd-none' );
-                logOutBtn.classList.toggle( 'd-none' );
+                $('#modalLoginForm').modal('hide');
+                logInBtn.classList.toggle('d-none');
+                logOutBtn.classList.toggle('d-none');
                 usersData.currentUser(user);
                 mediator.publish('userLogIn', user);
             }
@@ -424,25 +465,25 @@ var usersData = (function() {
         password : 'Vadim123'
     };
 
-    users.push( user1,user2 );
+    users.push(user1,user2);
 
 
     var getUserFromLocalStorage = function() {
         var users,
-            usersLS = localStorage.getItem( 'users' );
+            usersLS = localStorage.getItem('users');
 
         if( usersLS === null ) {
             users = [];
         } else {
-            users = JSON.parse( usersLS );
+            users = JSON.parse(usersLS);
         }
         return users;
     };
 
-    var addUserToLocalStorage = function( user ) {
+    var addUserToLocalStorage = function(user) {
         var users = getUserFromLocalStorage();
         users.push(user);
-        localStorage.setItem( 'users', JSON.stringify(users) );
+        localStorage.setItem('users', JSON.stringify(users));
     };
 
 
@@ -450,7 +491,7 @@ var usersData = (function() {
         var IDs = getUserID();
 
         IDs.push( ID );
-        localStorage.setItem( 'ID', JSON.stringify(IDs) );
+        localStorage.setItem('ID', JSON.stringify(IDs));
     };
 
 
@@ -462,12 +503,12 @@ var usersData = (function() {
 
         getCurrentUser: function() {
             var user,
-                currUser = localStorage.getItem( 'currentUser' );
+                currUser = localStorage.getItem('currentUser');
 
             if( currUser === null ) {
                 user = null;
             } else {
-                user = JSON.parse( currUser );
+                user = JSON.parse(currUser);
             }
             return user;
         },
@@ -475,7 +516,7 @@ var usersData = (function() {
         currentUser: function (user) {
             var currUser = [];
             currUser.push(user);
-            localStorage.setItem( 'currentUser', JSON.stringify(currUser) );
+            localStorage.setItem('currentUser', JSON.stringify(currUser));
         },
 
         deleteCurrentUser: function () {
