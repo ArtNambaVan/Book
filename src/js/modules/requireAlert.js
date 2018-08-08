@@ -4,10 +4,14 @@ var requireAlert = (function() {
 
         $('#requireAlert').show('fade');
 
-        setTimeout(function() {
-            $('#requireAlert').hide('fade');
-        }, 2000);
+
     };
 
     mediator.subscribe('mandatory', showAlert);
+
+    var hideAlert = function() {
+        $('#requireAlert').hide();
+    };
+
+    mediator.subscribe('hideMandatory', hideAlert);
 })();

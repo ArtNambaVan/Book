@@ -147,6 +147,7 @@ var booksFormController = (function() {
             var newItem = booksData.addBookItem(bookItem);
 
             mediator.publish('newBook', newItem);
+            mediator.publish('hideMandatory');
         } else {
             mediator.publish('mandatory');
         }
@@ -439,12 +440,16 @@ var requireAlert = (function() {
 
         $('#requireAlert').show('fade');
 
-        setTimeout(function() {
-            $('#requireAlert').hide('fade');
-        }, 2000);
+
     };
 
     mediator.subscribe('mandatory', showAlert);
+
+    var hideAlert = function() {
+        $('#requireAlert').hide();
+    };
+
+    mediator.subscribe('hideMandatory', hideAlert);
 })();
 
 var successAlert = (function() {
@@ -491,18 +496,28 @@ var userAuthorizationController = (function() {
     });
 
     var userLogin = function() {
-        var allUsers;
-        allUsers = usersData.getUsers();
 
+
+        allUsers = usersData.getUsers();
+        $('#loginError').hide();
         allUsers.forEach(function(user) {
             if (emailInput.value === user.email && passwordInput.value === user.password) {
+                $('#loginError').hide('fade');
                 $('#modalLoginForm').modal('hide');
                 logInBtn.classList.toggle('d-none');
                 logOutBtn.classList.toggle('d-none');
                 usersData.currentUser(user);
+                $('#loginError').hide('fade');
                 mediator.publish('userLogIn', user);
+                return;
+            } else {
+                console.log(loginForm);
+                $('#loginError').show('fade');
+                loginForm.reset();
+                emailInput.focus();
             }
         });
+
 
     };
 

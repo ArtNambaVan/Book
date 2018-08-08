@@ -84,6 +84,7 @@ var booksFormController = (function() {
             var newItem = booksData.addBookItem(bookItem);
 
             mediator.publish('newBook', newItem);
+            mediator.publish('hideMandatory');
         } else {
             mediator.publish('mandatory');
         }
