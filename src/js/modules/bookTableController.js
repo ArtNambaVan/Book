@@ -2,8 +2,6 @@ var bookTableController = (function() {
 
     var table = document.querySelector( '.books' );
 
-
-
     var addBookToTable = function(obj) {
         var bookList = document.querySelector('.table-group'),
             tmpl = document.getElementById('comment-template').content.cloneNode(true);
@@ -21,21 +19,16 @@ var bookTableController = (function() {
         mediator.publish('increaseCounter');
     };
 
-
-
-
-
     var updateBookPosition = function() {
-
-        var bookList = document.querySelector('.table-group');
-        Array.from(bookList.children).forEach(function(e, i) {
-            var position = e.querySelector('.position');
-
-            if (position != null) {
-                var num = i;
-                position.textContent = num;
+        var $bookRow = $('.books-table').find('.table-book:not(:first-child)');
+        $bookRow.each(function (index) {
+            if ($(this).attr('data-position') != (index + 1)) {
+                $(this).attr('data-position', (index + 1));
+                $(this).find('.position').text(index + 1);
             }
         });
+        booksData.localStorageNewPosition($bookRow);
+
     };
 
     var deleteBookFromTable = function(e) {
@@ -65,6 +58,12 @@ var bookTableController = (function() {
         var publicBooks = [],
             allBooks = booksData.getBookItems();
 
+        function comparePos(posA, posB) {
+            return posA.position - posB.position;
+        }
+
+        allBooks.sort(comparePos);
+
         allBooks.forEach(function(e) {
             if (e.type.toLowerCase() === 'public') {
                 addBookToTable(e);
@@ -92,6 +91,35 @@ var bookTableController = (function() {
         mediator.publish('removeCounter', books);
     };
 
+    var removeSortable = function() {
+        $('#sortable').sortable({
+            disabled: true
+        });
+    };
+
+    var sortable = function() {
+        $('.books-table').attr('id', 'sortable');
+        var arr = [];
+        $('#sortable').sortable({
+            update: function (event, ui) {
+                updateBookPosition();
+
+                saveNewPosition();
+            },
+            disabled: false
+
+        });
+
+    };
+
+    function saveNewPosition() {
+        var positions = [];
+        $('.updated').each(function () {
+            positions.push([$(this).rowIndex, $(this).attr('data-position')])
+            $(this).removeClass('updated');
+        });
+    }
+
     /////////
     ////////////// DEBUG ///////////////////
 
@@ -116,6 +144,8 @@ var bookTableController = (function() {
     mediator.subscribe('userLogIn', showPrivateBooks);
     mediator.subscribe('userLogOut', removePrivateBooks);
     mediator.subscribe('newBook', addBookToTable);
+    mediator.subscribe('userLogIn', sortable);
+    mediator.subscribe('userLogOut', removeSortable);
 
 
     /////////

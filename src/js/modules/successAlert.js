@@ -11,7 +11,7 @@ var successAlert = (function() {
 
         setTimeout(function() {
             $('#successAlert').hide('fade');
-        }, 2000);
+        }, 3000);
     };
 
     mediator.subscribe('userLogIn', showAlert);

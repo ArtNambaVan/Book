@@ -6,7 +6,7 @@ var requireAlert = (function() {
 
         setTimeout(function() {
             $('#requireAlert').hide('fade');
-        }, 1000);
+        }, 2000);
     };
 
     mediator.subscribe('mandatory', showAlert);

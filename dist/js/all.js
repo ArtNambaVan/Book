@@ -157,6 +157,7 @@ var booksData = (function() {
 
     var Book = function(id, obj) {
         this.id = id;
+        this.position = -1;
         this.title = obj.title;
         this.description = obj.description;
         this.author = obj.author;
@@ -239,15 +240,44 @@ var booksData = (function() {
             });
 
             localStorage.setItem('books', JSON.stringify(books));
+        },
+
+        localStorageNewPosition : function(books) {
+            var oldBooks = getBookFromLocalStorage();
+
+            oldBooks.forEach(function(e) {
+                books.each(function(i) {
+                    if (e.id == $(this).find('.id').text()) {
+                        e.position = $(this).find('.position').text();
+                    }
+                });
+
+            });
+
+            localStorage.setItem('books', JSON.stringify(oldBooks));
+
         }
+
+
+        /*localStorageNewPosition : function(books) {
+            var oldBooks = getBookFromLocalStorage();
+            for (var i = 0; i < oldBooks.length - 1; i++) {
+                for (var j = 0; j < books.length - 1; j++) {
+                    if (oldBooks[i].index === books[j].index) {
+                        oldBooks[i].position === books[j].position
+                    }
+                }
+            }
+
+            console.log(oldBooks);
+            console.log(books);
+        }*/
     };
 })();
 
 var bookTableController = (function() {
 
     var table = document.querySelector( '.books' );
-
-
 
     var addBookToTable = function(obj) {
         var bookList = document.querySelector('.table-group'),
@@ -266,21 +296,16 @@ var bookTableController = (function() {
         mediator.publish('increaseCounter');
     };
 
-
-
-
-
     var updateBookPosition = function() {
-
-        var bookList = document.querySelector('.table-group');
-        Array.from(bookList.children).forEach(function(e, i) {
-            var position = e.querySelector('.position');
-
-            if (position != null) {
-                var num = i;
-                position.textContent = num;
+        var $bookRow = $('.books-table').find('.table-book:not(:first-child)');
+        $bookRow.each(function (index) {
+            if ($(this).attr('data-position') != (index + 1)) {
+                $(this).attr('data-position', (index + 1));
+                $(this).find('.position').text(index + 1);
             }
         });
+        booksData.localStorageNewPosition($bookRow);
+
     };
 
     var deleteBookFromTable = function(e) {
@@ -310,6 +335,12 @@ var bookTableController = (function() {
         var publicBooks = [],
             allBooks = booksData.getBookItems();
 
+        function comparePos(posA, posB) {
+            return posA.position - posB.position;
+        }
+
+        allBooks.sort(comparePos);
+
         allBooks.forEach(function(e) {
             if (e.type.toLowerCase() === 'public') {
                 addBookToTable(e);
@@ -337,6 +368,35 @@ var bookTableController = (function() {
         mediator.publish('removeCounter', books);
     };
 
+    var removeSortable = function() {
+        $('#sortable').sortable({
+            disabled: true
+        });
+    };
+
+    var sortable = function() {
+        $('.books-table').attr('id', 'sortable');
+        var arr = [];
+        $('#sortable').sortable({
+            update: function (event, ui) {
+                updateBookPosition();
+
+                saveNewPosition();
+            },
+            disabled: false
+
+        });
+
+    };
+
+    function saveNewPosition() {
+        var positions = [];
+        $('.updated').each(function () {
+            positions.push([$(this).rowIndex, $(this).attr('data-position')])
+            $(this).removeClass('updated');
+        });
+    }
+
     /////////
     ////////////// DEBUG ///////////////////
 
@@ -361,6 +421,8 @@ var bookTableController = (function() {
     mediator.subscribe('userLogIn', showPrivateBooks);
     mediator.subscribe('userLogOut', removePrivateBooks);
     mediator.subscribe('newBook', addBookToTable);
+    mediator.subscribe('userLogIn', sortable);
+    mediator.subscribe('userLogOut', removeSortable);
 
 
     /////////
@@ -379,7 +441,7 @@ var requireAlert = (function() {
 
         setTimeout(function() {
             $('#requireAlert').hide('fade');
-        }, 1000);
+        }, 2000);
     };
 
     mediator.subscribe('mandatory', showAlert);
@@ -398,7 +460,7 @@ var successAlert = (function() {
 
         setTimeout(function() {
             $('#successAlert').hide('fade');
-        }, 2000);
+        }, 3000);
     };
 
     mediator.subscribe('userLogIn', showAlert);

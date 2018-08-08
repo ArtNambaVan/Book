@@ -77,6 +77,9 @@
 
     <div class="alert alert-danger collapse" id="requireAlert" role="alert">
     All the fields are mandatory
+    <button type="button" class="close" data-dismiss="alert" aria-label="aria-hidden">
+        <span aria-hidden="true">&times;</span>
+      </button>
 </div>
 
     <form id="book-form" class="mb-4" novalidate>
@@ -102,7 +105,7 @@
       <th scope="col"></th>
     </tr>
   </thead>
-  <tbody class="table-group books-table" id="sortable">
+  <tbody class="table-group books-table">
     <template id="comment-template">
       <tr class="table-book">
         <td class="id">1</td>
@@ -142,7 +145,7 @@
         <input type="text" class="form-control js-description" id="description" placeholder="Description" required>
     </div>
 
-    <div> <p  class="toggle-arrow" style="cursor: pointer"> Genre <span>&#709;</span> </p>
+    <div> <p  class="btn btn-block btn-info toggle-arrow" style="cursor: pointer"> Genre <span>&#709;</span> </p>
         <div class="row form-group panel">
             <div class="col">
                 <div class="custom-control custom-checkbox">

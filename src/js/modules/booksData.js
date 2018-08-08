@@ -2,6 +2,7 @@ var booksData = (function() {
 
     var Book = function(id, obj) {
         this.id = id;
+        this.position = -1;
         this.title = obj.title;
         this.description = obj.description;
         this.author = obj.author;
@@ -84,6 +85,37 @@ var booksData = (function() {
             });
 
             localStorage.setItem('books', JSON.stringify(books));
+        },
+
+        localStorageNewPosition : function(books) {
+            var oldBooks = getBookFromLocalStorage();
+
+            oldBooks.forEach(function(e) {
+                books.each(function(i) {
+                    if (e.id == $(this).find('.id').text()) {
+                        e.position = $(this).find('.position').text();
+                    }
+                });
+
+            });
+
+            localStorage.setItem('books', JSON.stringify(oldBooks));
+
         }
+
+
+        /*localStorageNewPosition : function(books) {
+            var oldBooks = getBookFromLocalStorage();
+            for (var i = 0; i < oldBooks.length - 1; i++) {
+                for (var j = 0; j < books.length - 1; j++) {
+                    if (oldBooks[i].index === books[j].index) {
+                        oldBooks[i].position === books[j].position
+                    }
+                }
+            }
+
+            console.log(oldBooks);
+            console.log(books);
+        }*/
     };
 })();
