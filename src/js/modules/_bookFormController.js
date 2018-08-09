@@ -11,10 +11,10 @@ var booksFormController = (function() {
         html = Mustache.to_html($tmpl);
         $bookForm.html(html).hide().fadeIn(1000);
 
-        addListenerOnGenre();
+        addListenerOnGenreBtn();
     };
 
-    var addListenerOnGenre = function() {
+    var addListenerOnGenreBtn = function() {
         var $arrow = $('#book-form').find('.toggle-arrow'),
             $panel = $('#book-form').find('.panel')
         ;
@@ -32,6 +32,7 @@ var booksFormController = (function() {
     };
 
     mediator.subscribe('userLogIn', createForm);
+    mediator.subscribe('userSession', createForm);
     mediator.subscribe('userLogOut', removeForm);
 
     bookForm.addEventListener('submit', function(e) {
@@ -79,7 +80,6 @@ var booksFormController = (function() {
                 date: date
             };
             bookForm.reset();
-
 
             var newItem = booksData.addBookItem(bookItem);
 

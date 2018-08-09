@@ -19,18 +19,18 @@ var mediator = (function() {
 
 })();
 
-var counterController = (function() {
+var bookCounter = (function() {
     var counter = document.querySelector('.js-count');
     var count = 0;
 
-    var publicBooksCounter = function(arr) {
-        count = arr.length;
+    var publicBooksCounter = function(books) {
+        count = books.length;
         counter.textContent = count;
         return count;
     };
 
-    var allBooksCounter = function(arr) {
-        count = arr.length;
+    var allBooksCounter = function(books) {
+        count = books.length;
         counter.textContent = count;
         return count;
     };
@@ -47,8 +47,8 @@ var counterController = (function() {
         return count;
     };
 
-    var removeCounter = function(arr) {
-        count -= arr.length;
+    var removeCounter = function(books) {
+        count -= books.length;
         counter.textContent = count;
         return count;
     };
@@ -56,8 +56,9 @@ var counterController = (function() {
     mediator.subscribe('countPublicBooks', publicBooksCounter);
     mediator.subscribe('countAllBooks', allBooksCounter);
     mediator.subscribe('increaseCounter', increaseCounter);
-    mediator.subscribe('removeCounter', removeCounter);
     mediator.subscribe('reduceCount', reduceCount);
+    mediator.subscribe('removeCounter', removeCounter);
+
 
 })();
 
@@ -74,10 +75,10 @@ var booksFormController = (function() {
         html = Mustache.to_html($tmpl);
         $bookForm.html(html).hide().fadeIn(1000);
 
-        addListenerOnGenre();
+        addListenerOnGenreBtn();
     };
 
-    var addListenerOnGenre = function() {
+    var addListenerOnGenreBtn = function() {
         var $arrow = $('#book-form').find('.toggle-arrow'),
             $panel = $('#book-form').find('.panel')
         ;
@@ -95,6 +96,7 @@ var booksFormController = (function() {
     };
 
     mediator.subscribe('userLogIn', createForm);
+    mediator.subscribe('userSession', createForm);
     mediator.subscribe('userLogOut', removeForm);
 
     bookForm.addEventListener('submit', function(e) {
@@ -142,7 +144,6 @@ var booksFormController = (function() {
                 date: date
             };
             bookForm.reset();
-
 
             var newItem = booksData.addBookItem(bookItem);
 
@@ -256,23 +257,7 @@ var booksData = (function() {
             });
 
             localStorage.setItem('books', JSON.stringify(oldBooks));
-
         }
-
-
-        /*localStorageNewPosition : function(books) {
-            var oldBooks = getBookFromLocalStorage();
-            for (var i = 0; i < oldBooks.length - 1; i++) {
-                for (var j = 0; j < books.length - 1; j++) {
-                    if (oldBooks[i].index === books[j].index) {
-                        oldBooks[i].position === books[j].position
-                    }
-                }
-            }
-
-            console.log(oldBooks);
-            console.log(books);
-        }*/
     };
 })();
 
@@ -301,7 +286,7 @@ var bookTableController = (function() {
         var $bookRow = $('.books-table').find('.table-book:not(:first-child)');
         $bookRow.each(function (index) {
             if ($(this).attr('data-position') != (index + 1)) {
-                $(this).attr('data-position', (index + 1));
+                $(this).attr('data-position', (index + 1)).addClass('updated');
                 $(this).find('.position').text(index + 1);
             }
         });
@@ -332,6 +317,16 @@ var bookTableController = (function() {
         mediator.publish('countAllBooks', allBooks);
     };
 
+/*    var showAllBooks = function() {
+        var allBooks = booksData.getBookItems();
+
+        allBooks.forEach(function(e) {
+            addBookToTable(e);
+        });
+
+        mediator.publish('countAllBooks', allBooks);
+    };*/
+
     var showPublicBooks = function() {
         var publicBooks = [],
             allBooks = booksData.getBookItems();
@@ -353,6 +348,14 @@ var bookTableController = (function() {
         mediator.publish('countPublicBooks', publicBooks);
     };
 
+    var removeAllBooks = function() {
+        var booksRow = document.querySelectorAll('.table-book');
+        booksRow.forEach(function( e ) {
+            e.remove();
+        });
+        updateBookPosition();
+    };
+
     var removePrivateBooks = function() {
         var booksRow = document.querySelectorAll('.table-book');
         var books = [];
@@ -369,11 +372,6 @@ var bookTableController = (function() {
         mediator.publish('removeCounter', books);
     };
 
-    var removeSortable = function() {
-        $('#sortable').sortable({
-            disabled: true
-        });
-    };
 
     var sortable = function() {
         $('.books-table').attr('id', 'sortable');
@@ -390,13 +388,20 @@ var bookTableController = (function() {
 
     };
 
-    function saveNewPosition() {
+    var removeSortable = function() {
+        $('#sortable').sortable({
+            disabled: true
+        });
+    };
+
+    var saveNewPosition = function() {
         var positions = [];
         $('.updated').each(function () {
-            positions.push([$(this).rowIndex, $(this).attr('data-position')])
+            console.log($(this));
+            positions.push([$(this).rowIndex, $(this).attr('data-position')]);
             $(this).removeClass('updated');
         });
-    }
+    };
 
     /////////
     ////////////// DEBUG ///////////////////
@@ -412,6 +417,7 @@ var bookTableController = (function() {
     };
 
     mediator.subscribe('userLogIn', showBtn);
+    mediator.subscribe('userSession', showBtn);
     mediator.subscribe('userLogOut', hideBtn);
 
     /////////
@@ -420,9 +426,14 @@ var bookTableController = (function() {
 
     showPublicBooks();
     mediator.subscribe('userLogIn', showPrivateBooks);
-    mediator.subscribe('userLogOut', removePrivateBooks);
+    mediator.subscribe('userSession', showPrivateBooks);
+/*    mediator.subscribe('userLogIn', showAllBooks);
+    mediator.subscribe('userSession', showAllBooks);*/
+    //mediator.subscribe('userLogOut', removePrivateBooks);
+    //mediator.subscribe('userLogOut', removeAllBooks);
     mediator.subscribe('newBook', addBookToTable);
     mediator.subscribe('userLogIn', sortable);
+    mediator.subscribe('userSession', sortable);
     mediator.subscribe('userLogOut', removeSortable);
 
 
@@ -431,6 +442,78 @@ var bookTableController = (function() {
     hideBtn();
     /////////
     ////////////// DEBUG ///////////////////
+
+
+
+/*    var createBtn = function() {
+        var deleteTD = document.querySelectorAll('.delete'),
+            tmpl = document.getElementById('comment-template').content.cloneNode(true);
+        var delBtn = tmpl.querySelector('.delete');
+        var btn = tmpl.querySelector('.js-delete-btn');
+        btn.addEventListener('click', deleteBookFromTable);
+        deleteTD.forEach(function(e) {
+            console.log(e);
+            e.appendChild(btn);
+        });
+    };
+
+
+
+    var removeBtn = function() {
+        $('.books-table').find('.js-delete-btn').each(function() {
+            $(this).remove();
+        });
+
+    };
+
+    mediator.subscribe('userLogOut', removeBtn);
+    mediator.subscribe('userLogIn', createBtn);*/
+
+
+})();
+
+var cookies = (function() {
+
+    var setCookie = function(name, value, options) {
+        options = options || {};
+
+        var expires = options.expires;
+
+        if (typeof expires == 'number' && expires) {
+            var d = new Date();
+            d.setTime(d.getTime() + expires * 1000);
+            expires = options.expires = d;
+        }
+        if (expires && expires.toUTCString) {
+            options.expires = expires.toUTCString();
+        }
+
+        value = encodeURIComponent(value);
+
+        var updatedCookie = name + '=' + value;
+
+        for (var propName in options) {
+            updatedCookie += '; ' + propName;
+            var propValue = options[propName];
+            if (propValue !== true) {
+                updatedCookie += '=' + propValue;
+            }
+        }
+
+        document.cookie = updatedCookie;
+    };
+
+    var deleteCookie = function(name) {
+        setCookie(name, '', {
+            expires: -1
+        });
+    };
+
+    return {
+        setCookie: setCookie,
+        deleteCookie: deleteCookie
+    };
+
 
 })();
 
@@ -450,6 +533,7 @@ var requireAlert = (function() {
     };
 
     mediator.subscribe('hideMandatory', hideAlert);
+    mediator.subscribe('userLogOut', hideAlert);
 })();
 
 var successAlert = (function() {
@@ -480,11 +564,9 @@ var userAuthorizationController = (function() {
         logInBtn        = document.querySelector('.js-login')
     ;
 
-
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         userLogin();
-
     });
 
     logOutBtn.addEventListener('click', function(e) {
@@ -493,35 +575,43 @@ var userAuthorizationController = (function() {
         logOutBtn.classList.toggle('d-none');
         usersData.deleteCurrentUser();
         mediator.publish('userLogOut');
+        cookies.deleteCookie('name');
     });
 
     var userLogin = function() {
 
+        var allUsers = usersData.getUsers();
 
-        allUsers = usersData.getUsers();
-        $('#loginError').hide();
-        allUsers.forEach(function(user) {
-            if (emailInput.value === user.email && passwordInput.value === user.password) {
+        for (var i = 0; i < allUsers.length; i++) {
+            if (emailInput.value.toLowerCase() === allUsers[i].email.toLowerCase() && passwordInput.value === allUsers[i].password) {
                 $('#loginError').hide('fade');
                 $('#modalLoginForm').modal('hide');
-                logInBtn.classList.toggle('d-none');
-                logOutBtn.classList.toggle('d-none');
-                usersData.currentUser(user);
-                $('#loginError').hide('fade');
-                mediator.publish('userLogIn', user);
-                return;
-            } else {
-                console.log(loginForm);
-                $('#loginError').show('fade');
-                loginForm.reset();
-                emailInput.focus();
-            }
-        });
 
+                usersData.currentUser(allUsers[i]);
+                $('#loginError').hide('fade');
+                changeBtn();
+                mediator.publish('userLogIn', allUsers[i]);
+                cookies.setCookie('name', allUsers[i].name, {expires: 3600});
+                return;
+            }
+        }
+
+        $('#loginError').show('fade');
+        loginForm.reset();
+        emailInput.focus();
 
     };
 
+
+    var changeBtn = function() {
+        logInBtn.classList.toggle('d-none');
+        logOutBtn.classList.toggle('d-none');
+    };
+
+    mediator.subscribe('userSession', changeBtn);
+
 })();
+
 
 var usersData = (function() {
 
@@ -531,15 +621,15 @@ var usersData = (function() {
     users = [];
     user1 = {
         id       : 1,
-        name     : 'Artem',
-        email    : 'Arthorror@gmail.com',
-        password : 'Anthrax1'
+        name     : 'User1',
+        email    : 'user1@gmail.com',
+        password : 'user1'
     };
     user2 = {
         id       : 2,
-        name     : 'Vadim',
-        email    : 'Vadim@gmail.com',
-        password : 'Vadim123'
+        name     : 'Artem',
+        email    : 'Artem@gmail.com',
+        password : 'artem123'
     };
 
     users.push(user1,user2);
@@ -602,3 +692,17 @@ var usersData = (function() {
     };
 
 })();
+
+var getCookie = (function(name){
+    var matches = document.cookie.match(new RegExp(
+        '(?:^|; )' + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'
+    ));
+    var userName = matches ? decodeURIComponent(matches[1]) : undefined;
+    if (userName) {
+        mediator.publish('userSession', userName);
+    }
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+})('name');
+
+
+

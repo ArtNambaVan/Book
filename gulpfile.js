@@ -75,17 +75,13 @@ var NUNJUCKS_DEFAULTS = {
     // }
 };
 
-// CSS ================================================
-//
+
 gulp.task('css', function() {
-    // console.log('*************************');
-    // console.log('*** Starting CSS task ***');
-    // console.log('*************************');
 
     return gulp.src(PATH.css.in)
         .pipe(changed(PATH.css.out))
         .pipe(gulp.dest(PATH.css.out))
-        ;
+    ;
 });
 
 gulp.task('styles', ['css']);

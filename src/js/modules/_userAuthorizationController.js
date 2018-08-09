@@ -7,11 +7,9 @@ var userAuthorizationController = (function() {
         logInBtn        = document.querySelector('.js-login')
     ;
 
-
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         userLogin();
-
     });
 
     logOutBtn.addEventListener('click', function(e) {
@@ -20,32 +18,40 @@ var userAuthorizationController = (function() {
         logOutBtn.classList.toggle('d-none');
         usersData.deleteCurrentUser();
         mediator.publish('userLogOut');
+        cookies.deleteCookie('name');
     });
 
     var userLogin = function() {
 
+        var allUsers = usersData.getUsers();
 
-        allUsers = usersData.getUsers();
-        $('#loginError').hide();
-        allUsers.forEach(function(user) {
-            if (emailInput.value === user.email && passwordInput.value === user.password) {
+        for (var i = 0; i < allUsers.length; i++) {
+            if (emailInput.value.toLowerCase() === allUsers[i].email.toLowerCase() && passwordInput.value === allUsers[i].password) {
                 $('#loginError').hide('fade');
                 $('#modalLoginForm').modal('hide');
-                logInBtn.classList.toggle('d-none');
-                logOutBtn.classList.toggle('d-none');
-                usersData.currentUser(user);
-                $('#loginError').hide('fade');
-                mediator.publish('userLogIn', user);
-                return;
-            } else {
-                console.log(loginForm);
-                $('#loginError').show('fade');
-                loginForm.reset();
-                emailInput.focus();
-            }
-        });
 
+                usersData.currentUser(allUsers[i]);
+                $('#loginError').hide('fade');
+                changeBtn();
+                mediator.publish('userLogIn', allUsers[i]);
+                cookies.setCookie('name', allUsers[i].name, {expires: 3600});
+                return;
+            }
+        }
+
+        $('#loginError').show('fade');
+        loginForm.reset();
+        emailInput.focus();
 
     };
 
+
+    var changeBtn = function() {
+        logInBtn.classList.toggle('d-none');
+        logOutBtn.classList.toggle('d-none');
+    };
+
+    mediator.subscribe('userSession', changeBtn);
+
 })();
+

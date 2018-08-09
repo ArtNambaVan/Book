@@ -1,15 +1,15 @@
-var counterController = (function() {
+var bookCounter = (function() {
     var counter = document.querySelector('.js-count');
     var count = 0;
 
-    var publicBooksCounter = function(arr) {
-        count = arr.length;
+    var publicBooksCounter = function(books) {
+        count = books.length;
         counter.textContent = count;
         return count;
     };
 
-    var allBooksCounter = function(arr) {
-        count = arr.length;
+    var allBooksCounter = function(books) {
+        count = books.length;
         counter.textContent = count;
         return count;
     };
@@ -26,8 +26,8 @@ var counterController = (function() {
         return count;
     };
 
-    var removeCounter = function(arr) {
-        count -= arr.length;
+    var removeCounter = function(books) {
+        count -= books.length;
         counter.textContent = count;
         return count;
     };
@@ -35,7 +35,8 @@ var counterController = (function() {
     mediator.subscribe('countPublicBooks', publicBooksCounter);
     mediator.subscribe('countAllBooks', allBooksCounter);
     mediator.subscribe('increaseCounter', increaseCounter);
-    mediator.subscribe('removeCounter', removeCounter);
     mediator.subscribe('reduceCount', reduceCount);
+    mediator.subscribe('removeCounter', removeCounter);
+
 
 })();

@@ -100,22 +100,6 @@ var booksData = (function() {
             });
 
             localStorage.setItem('books', JSON.stringify(oldBooks));
-
         }
-
-
-        /*localStorageNewPosition : function(books) {
-            var oldBooks = getBookFromLocalStorage();
-            for (var i = 0; i < oldBooks.length - 1; i++) {
-                for (var j = 0; j < books.length - 1; j++) {
-                    if (oldBooks[i].index === books[j].index) {
-                        oldBooks[i].position === books[j].position
-                    }
-                }
-            }
-
-            console.log(oldBooks);
-            console.log(books);
-        }*/
     };
 })();

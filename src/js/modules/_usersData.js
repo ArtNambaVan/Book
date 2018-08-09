@@ -6,15 +6,15 @@ var usersData = (function() {
     users = [];
     user1 = {
         id       : 1,
-        name     : 'Artem',
-        email    : 'Arthorror@gmail.com',
-        password : 'Anthrax1'
+        name     : 'User1',
+        email    : 'user1@gmail.com',
+        password : 'user1'
     };
     user2 = {
         id       : 2,
-        name     : 'Vadim',
-        email    : 'Vadim@gmail.com',
-        password : 'Vadim123'
+        name     : 'Artem',
+        email    : 'Artem@gmail.com',
+        password : 'artem123'
     };
 
     users.push(user1,user2);

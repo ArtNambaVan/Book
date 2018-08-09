@@ -23,7 +23,7 @@ var bookTableController = (function() {
         var $bookRow = $('.books-table').find('.table-book:not(:first-child)');
         $bookRow.each(function (index) {
             if ($(this).attr('data-position') != (index + 1)) {
-                $(this).attr('data-position', (index + 1));
+                $(this).attr('data-position', (index + 1)).addClass('updated');
                 $(this).find('.position').text(index + 1);
             }
         });
@@ -54,6 +54,16 @@ var bookTableController = (function() {
         mediator.publish('countAllBooks', allBooks);
     };
 
+/*    var showAllBooks = function() {
+        var allBooks = booksData.getBookItems();
+
+        allBooks.forEach(function(e) {
+            addBookToTable(e);
+        });
+
+        mediator.publish('countAllBooks', allBooks);
+    };*/
+
     var showPublicBooks = function() {
         var publicBooks = [],
             allBooks = booksData.getBookItems();
@@ -75,6 +85,14 @@ var bookTableController = (function() {
         mediator.publish('countPublicBooks', publicBooks);
     };
 
+    var removeAllBooks = function() {
+        var booksRow = document.querySelectorAll('.table-book');
+        booksRow.forEach(function( e ) {
+            e.remove();
+        });
+        updateBookPosition();
+    };
+
     var removePrivateBooks = function() {
         var booksRow = document.querySelectorAll('.table-book');
         var books = [];
@@ -91,11 +109,6 @@ var bookTableController = (function() {
         mediator.publish('removeCounter', books);
     };
 
-    var removeSortable = function() {
-        $('#sortable').sortable({
-            disabled: true
-        });
-    };
 
     var sortable = function() {
         $('.books-table').attr('id', 'sortable');
@@ -112,13 +125,20 @@ var bookTableController = (function() {
 
     };
 
-    function saveNewPosition() {
+    var removeSortable = function() {
+        $('#sortable').sortable({
+            disabled: true
+        });
+    };
+
+    var saveNewPosition = function() {
         var positions = [];
         $('.updated').each(function () {
-            positions.push([$(this).rowIndex, $(this).attr('data-position')])
+            console.log($(this));
+            positions.push([$(this).rowIndex, $(this).attr('data-position')]);
             $(this).removeClass('updated');
         });
-    }
+    };
 
     /////////
     ////////////// DEBUG ///////////////////
@@ -134,6 +154,7 @@ var bookTableController = (function() {
     };
 
     mediator.subscribe('userLogIn', showBtn);
+    mediator.subscribe('userSession', showBtn);
     mediator.subscribe('userLogOut', hideBtn);
 
     /////////
@@ -142,9 +163,14 @@ var bookTableController = (function() {
 
     showPublicBooks();
     mediator.subscribe('userLogIn', showPrivateBooks);
-    mediator.subscribe('userLogOut', removePrivateBooks);
+    mediator.subscribe('userSession', showPrivateBooks);
+/*    mediator.subscribe('userLogIn', showAllBooks);
+    mediator.subscribe('userSession', showAllBooks);*/
+    //mediator.subscribe('userLogOut', removePrivateBooks);
+    //mediator.subscribe('userLogOut', removeAllBooks);
     mediator.subscribe('newBook', addBookToTable);
     mediator.subscribe('userLogIn', sortable);
+    mediator.subscribe('userSession', sortable);
     mediator.subscribe('userLogOut', removeSortable);
 
 
@@ -153,5 +179,32 @@ var bookTableController = (function() {
     hideBtn();
     /////////
     ////////////// DEBUG ///////////////////
+
+
+
+/*    var createBtn = function() {
+        var deleteTD = document.querySelectorAll('.delete'),
+            tmpl = document.getElementById('comment-template').content.cloneNode(true);
+        var delBtn = tmpl.querySelector('.delete');
+        var btn = tmpl.querySelector('.js-delete-btn');
+        btn.addEventListener('click', deleteBookFromTable);
+        deleteTD.forEach(function(e) {
+            console.log(e);
+            e.appendChild(btn);
+        });
+    };
+
+
+
+    var removeBtn = function() {
+        $('.books-table').find('.js-delete-btn').each(function() {
+            $(this).remove();
+        });
+
+    };
+
+    mediator.subscribe('userLogOut', removeBtn);
+    mediator.subscribe('userLogIn', createBtn);*/
+
 
 })();

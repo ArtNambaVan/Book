@@ -14,4 +14,5 @@ var requireAlert = (function() {
     };
 
     mediator.subscribe('hideMandatory', hideAlert);
+    mediator.subscribe('userLogOut', hideAlert);
 })();
