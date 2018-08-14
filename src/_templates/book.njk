@@ -9,14 +9,12 @@
     {% block title %} {% endblock title %}
 
     <link rel="stylesheet" href="css/bootstrap.css" />
-    <!-- Latest compiled and minified CSS -->
-
-
 
     <script src="js/jquery.js"></script>
     <script src="js/bootstrap.js"></script>
     <script src="js/mustache.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script src="js/jquery-ui.js"></script>
 
 
 </head>
@@ -24,13 +22,9 @@
 
 <body class="bg-light">
 
-
-    {% include "partials/modal-login.njk" %}
 <div class="container">
-    {% include "partials/alert-welcome.njk" %}
+    {% include "partials/modal-login.njk" %}
     {% include "partials/counter.njk" %}
-    {% include "partials/btn-group.njk" %}
-    {% include "partials/alert-require.njk" %}
     {% include "partials/form.njk" %}
 
     <div class="books">
@@ -39,7 +33,6 @@
 
 
 </div>
-    {% include "partials/scripts-temp.njk" %}
     {% block scripts %}
       <script src="js/all.js"></script>
     {% endblock scripts %}

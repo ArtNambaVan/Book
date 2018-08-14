@@ -9,6 +9,8 @@ const gulp       = require('gulp'),
   changed        = require('gulp-changed'),
   nunjucksRender = require('gulp-nunjucks-render'),
   concat         = require('gulp-concat'),
+  uglify         = require('gulp-uglify'),
+  cleanCSS       = require('gulp-clean-css'),
 
   // other plugins
   browsersync    = require('browser-sync'),
@@ -51,44 +53,40 @@ PATH.njk = {
   out : PATH.src
 };
 
-// OPTIONS ============================================
-//
-// SERVER
+
 const SYNC_CONFIG = {
   port   : 3333,
   browser: "chrome",
   server : {
     baseDir : PATH.dest,
 
-    //index : 'promotion-rules.html'
     index : 'index.html'
   },
   open   : true,
   notify : false
 };
 
-// NUNJUCKS options
+
 var NUNJUCKS_DEFAULTS = {
     path: 'src/_templates/'
-    // envOptions: {
-    //     watch: false
-    // }
 };
+
+var JS_MODULES = {
+    path: 'src/js/modules'
+}
 
 
 gulp.task('css', function() {
 
     return gulp.src(PATH.css.in)
-        .pipe(changed(PATH.css.out))
+        //.pipe(changed(PATH.css.out))
+        .pipe(cleanCSS())
         .pipe(gulp.dest(PATH.css.out))
     ;
 });
 
 gulp.task('styles', ['css']);
 
-
-// JS ================================================
-//
 
 gulp.task('concat', function() {
     return gulp.src(PATH.concat.in)
@@ -98,37 +96,64 @@ gulp.task('concat', function() {
         ;
 })
 
+gulp.task('js:vendor', function() {
+    gulp.src(JS_MODULES({
+          "overrides": {
+              "jquery": {
+                  "main": "./dist/jquery.min.js"
+              },
+
+            "magnific-popup": {
+                  "main": "./dist/jquery.magnific-popup.min.js"
+              },
+
+             "slick-carousel": {
+                  "main": "./slick/slick.min.js"
+              },
+
+              "readmore-js": {
+                  "main": "./readmore.js"
+              }
+          }
+  }))
+      .pipe(jsFilter)
+      .pipe(concat('vendor.js'))
+      .pipe(gulpIf(env !== 'dev', uglify()))
+    .pipe(size())
+      .pipe(gulp.dest(outputDir + 'js'))
+});
+
+
+/*gulp.task('concat', function() {
+    return gulp.src(PATH.concat.in)
+        .pipe(concat('all.js'))
+        .pipe(changed(PATH.concat.out))
+        .pipe(gulp.dest(PATH.concat.out))
+        ;
+})*/
+
 gulp.task('js', function() {
 
     return gulp.src(PATH.js.in)
+
         .pipe(changed(PATH.js.out))
+        .pipe(uglify())
         .pipe(gulp.dest(PATH.js.out))
         ;
 });
 
-
-// TEMPLATING ==========================================
-//
-
 gulp.task('nunjucks', function() {
-    // console.log('******************************');
-    // console.log('*** Starting NUNJUCKS task ***');
-    // console.log('******************************');
 
-    // var stream = gulp.src(PATH.tpl.in)
     return gulp.src(PATH.njk.in)
         .pipe(changed(PATH.njk.out))
         .pipe(nunjucksRender(NUNJUCKS_DEFAULTS))
         .pipe(gulp.dest(PATH.njk.out))
         ;
-    // return stream;
+
 });
 
-// handle html
+
 gulp.task('html', ['nunjucks'], function() {
-    // console.log('**************************');
-    // console.log('*** Starting HTML task ***');
-    // console.log('**************************');
 
     return gulp.src(PATH.html.in)
         .pipe(changed(PATH.html.out))
@@ -136,9 +161,7 @@ gulp.task('html', ['nunjucks'], function() {
         ;
 });
 
-// OTHER ===============================================
-//
-// BUILD
+
 gulp.task('build',
 
     [   'styles',
@@ -154,7 +177,6 @@ gulp.task('build',
     }
 );
 
-// CLEAN
 gulp.task('clean', function() {
   del(
     [
@@ -163,20 +185,18 @@ gulp.task('clean', function() {
   );
 });
 
-// Browser-sync task
 gulp.task('browsersync', function() {
     browsersync(SYNC_CONFIG);
 });
 
 
-// default task
+
 gulp.task('default', ['browsersync', 'build'], function() {
 
     // css changes
     gulp.watch(PATH.css.in,    ['css']);
 
     // js changes
-
 
     gulp.watch(PATH.js.in,     ['js', browsersync.reload]);
 

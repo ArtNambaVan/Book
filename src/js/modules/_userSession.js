@@ -5,6 +5,8 @@ var getCookie = (function(name){
     var userName = matches ? decodeURIComponent(matches[1]) : undefined;
     if (userName) {
         mediator.publish('userSession', userName);
+    } else {
+        mediator.publish('userOutSession', userName);
     }
     return matches ? decodeURIComponent(matches[1]) : undefined;
 })('name');

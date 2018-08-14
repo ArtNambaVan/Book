@@ -2,41 +2,36 @@ var bookCounter = (function() {
     var counter = document.querySelector('.js-count');
     var count = 0;
 
-    var publicBooksCounter = function(books) {
+    function publicBooksCounter(books) {
         count = books.length;
         counter.textContent = count;
         return count;
     };
 
-    var allBooksCounter = function(books) {
+    function allBooksCounter(books) {
         count = books.length;
         counter.textContent = count;
         return count;
     };
 
-    var increaseCounter = function() {
+    function increaseCounter() {
         count ++;
         counter.textContent = count;
         return count;
     };
 
-    var reduceCount = function() {
+    function reduceCount() {
         count--;
         counter.textContent = count;
         return count;
     };
 
-    var removeCounter = function(books) {
-        count -= books.length;
-        counter.textContent = count;
-        return count;
-    };
+
 
     mediator.subscribe('countPublicBooks', publicBooksCounter);
     mediator.subscribe('countAllBooks', allBooksCounter);
     mediator.subscribe('increaseCounter', increaseCounter);
     mediator.subscribe('reduceCount', reduceCount);
-    mediator.subscribe('removeCounter', removeCounter);
 
 
 })();

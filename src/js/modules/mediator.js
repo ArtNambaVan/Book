@@ -11,7 +11,15 @@ var mediator = (function() {
         publish : function(eventName, data) {
             if (subscribers[eventName]) {
                 subscribers[eventName].forEach(function(fn) {
-                    fn(data);
+                    if (typeof fn === 'object') {
+                        fn.forEach(function(item) {
+                            item(data)
+                        })
+
+                    } else {
+                        fn(data);
+                        console.log(fn)
+                    }
                 });
             }
         }

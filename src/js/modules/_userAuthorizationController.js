@@ -33,6 +33,7 @@ var userAuthorizationController = (function() {
                 usersData.currentUser(allUsers[i]);
                 $('#loginError').hide('fade');
                 changeBtn();
+                showAlert(allUsers[i]);
                 mediator.publish('userLogIn', allUsers[i]);
                 cookies.setCookie('name', allUsers[i].name, {expires: 3600});
                 return;
@@ -51,7 +52,22 @@ var userAuthorizationController = (function() {
         logOutBtn.classList.toggle('d-none');
     };
 
+    var showAlert = function(obj) {
+
+        var user = usersData.getCurrentUser()[0] || obj;
+        var tmpl = '{{name}}';
+        var html = Mustache.to_html(tmpl, user);
+
+        $('#user-name').html(html);
+        $('#successAlert').show('fade');
+
+        setTimeout(function() {
+            $('#successAlert').hide('fade');
+        }, 3000);
+    };
+
     mediator.subscribe('userSession', changeBtn);
+    mediator.subscribe('userSession', showAlert);
 
 })();
 

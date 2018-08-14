@@ -1,7 +1,7 @@
 var usersData = (function() {
 
 
-    var users, user1, user2;
+    var users, user1, user2, user3;
 
     users = [];
     user1 = {
@@ -12,40 +12,19 @@ var usersData = (function() {
     };
     user2 = {
         id       : 2,
+        name     : 'User2',
+        email    : 'user2@gmail.com',
+        password : 'User123'
+    };
+
+    user3 = {
+        id       : 3,
         name     : 'Artem',
-        email    : 'Artem@gmail.com',
-        password : 'artem123'
+        email    : 'Arthorror@gmail.com',
+        password : 'Anthrax1'
     };
 
-    users.push(user1,user2);
-
-
-    var getUserFromLocalStorage = function() {
-        var users,
-            usersLS = localStorage.getItem('users');
-
-        if( usersLS === null ) {
-            users = [];
-        } else {
-            users = JSON.parse(usersLS);
-        }
-        return users;
-    };
-
-    var addUserToLocalStorage = function(user) {
-        var users = getUserFromLocalStorage();
-        users.push(user);
-        localStorage.setItem('users', JSON.stringify(users));
-    };
-
-
-    var addUserID = function( ID ) {
-        var IDs = getUserID();
-
-        IDs.push( ID );
-        localStorage.setItem('ID', JSON.stringify(IDs));
-    };
-
+    users.push(user1,user2, user3);
 
 
     return {
